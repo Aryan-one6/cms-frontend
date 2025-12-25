@@ -1,0 +1,75 @@
+import { Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider } from "./lib/auth";
+import LoginPage from "./pages/LoginPage";
+import Dashboard from "./pages/Dashboard";
+import PostsPage from "./pages/PostsPage";
+import ProtectedRoute from "./routes/ProtectedRoute";
+import PostCreatePage from "./pages/PostCreatePage";
+import PostEditPage from "./pages/PostEditPage";
+import SignupPage from "./pages/SignupPage";
+import ForgotPasswordPage from "./pages/ForgotPasswordPage";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
+import SitesPage from "./pages/SitesPage";
+import { SiteProvider } from "./lib/site";
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <SiteProvider>
+        <Routes>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/signup" element={<SignupPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
+
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/posts"
+            element={
+              <ProtectedRoute>
+                <PostsPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/posts/new"
+            element={
+              <ProtectedRoute>
+                <PostCreatePage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/posts/:id/edit"
+            element={
+              <ProtectedRoute>
+                <PostEditPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/sites"
+            element={
+              <ProtectedRoute>
+                <SitesPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route path="*" element={<Navigate to="/" />} />
+        </Routes>
+      </SiteProvider>
+    </AuthProvider>
+  );
+}
