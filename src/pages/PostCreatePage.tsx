@@ -11,14 +11,19 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { buildAssetUrl } from "@/lib/media";
 import type { UploadResponse } from "@/lib/upload";
+import { generateSeoDraft } from "@/lib/ai";
 
 export default function PostCreatePage() {
   const navigate = useNavigate();
 
   const [title, setTitle] = useState("");
+  const [slug, setSlug] = useState("");
+  const [slugDirty, setSlugDirty] = useState(false);
   const [excerpt, setExcerpt] = useState("");
   const [contentHtml, setContentHtml] = useState("<p></p>");
   const [tagsText, setTagsText] = useState(""); // comma separated
+  const [aiTopic, setAiTopic] = useState("");
+  const [aiLoading, setAiLoading] = useState(false);
 
   const [coverImageUrl, setCoverImageUrl] = useState("");
   const [uploading, setUploading] = useState(false);
@@ -41,6 +46,14 @@ export default function PostCreatePage() {
     }
   }
 
+  function toSlug(value: string) {
+    return value
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)+/g, "");
+  }
+
   async function handleCreate(e: FormEvent) {
     e.preventDefault();
     setError("");
@@ -54,6 +67,7 @@ export default function PostCreatePage() {
 
       const res = await api.post("/admin/posts", {
         title,
+        slug: slug || toSlug(title),
         excerpt: excerpt || undefined,
         coverImageUrl: coverImageUrl || undefined,
         contentHtml,
@@ -74,6 +88,27 @@ export default function PostCreatePage() {
     .filter(Boolean);
 
   const coverFullUrl = buildAssetUrl(coverImageUrl);
+
+  async function handleGenerate() {
+    if (!aiTopic.trim()) {
+      setError("Enter a topic to generate a draft.");
+      return;
+    }
+    setAiLoading(true);
+    setError("");
+    try {
+      const draft = await generateSeoDraft(aiTopic.trim());
+      if (draft.title) setTitle(draft.title);
+      if (draft.slug && !slugDirty) setSlug(draft.slug);
+      if (draft.excerpt) setExcerpt(draft.excerpt);
+      if (draft.contentHtml) setContentHtml(draft.contentHtml);
+      if (draft.tags?.length) setTagsText(draft.tags.join(", "));
+    } catch (err: any) {
+      setError(err?.message || "Failed to generate draft");
+    } finally {
+      setAiLoading(false);
+    }
+  }
 
   return (
     <AdminLayout>
@@ -98,8 +133,8 @@ export default function PostCreatePage() {
           <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>
         )}
 
-        <div className="grid items-start gap-6 xl:grid-cols-3">
-          <Card className="xl:col-span-2">
+        <div className="grid items-start gap-6 xl:grid-cols-2">
+          <Card className="xl:col-span-1">
             <CardHeader>
               <CardTitle>Post details</CardTitle>
               <CardDescription>Title, summary, tags, cover image, and the main content.</CardDescription>
@@ -110,10 +145,27 @@ export default function PostCreatePage() {
                   <label className="text-sm font-medium text-slate-700">Title</label>
                   <Input
                     value={title}
-                    onChange={(e) => setTitle(e.target.value)}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setTitle(val);
+                      if (!slugDirty) setSlug(toSlug(val));
+                    }}
                     placeholder="A captivating title"
                     required
                   />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-slate-700">Slug</label>
+                  <Input
+                    value={slug}
+                    onChange={(e) => {
+                      setSlug(e.target.value);
+                      setSlugDirty(true);
+                    }}
+                    placeholder="my-awesome-post"
+                  />
+                  <p className="text-xs text-slate-500">Used in URLs. Leave blank to auto-generate from the title.</p>
                 </div>
 
                 <div className="space-y-2">
@@ -187,8 +239,31 @@ export default function PostCreatePage() {
                 <CardTitle className="text-sm">Publishing tips</CardTitle>
                 <CardDescription>Use tags for discovery and keep the excerpt concise.</CardDescription>
               </CardHeader>
-              <CardContent className="text-xs text-slate-500">
-                Preview updates automatically while you type. Publish as a draft now and finalize later.
+              <CardContent className="space-y-3 text-xs text-slate-500">
+                <div>
+                  Preview updates automatically while you type. Publish as a draft now and finalize later.
+                </div>
+                <div className="space-y-2 rounded-xl border border-slate-200 bg-slate-50 p-3">
+                  <div className="text-[11px] font-semibold text-slate-700">AI helper</div>
+                  <Input
+                    placeholder="Topic for SEO draft"
+                    value={aiTopic}
+                    onChange={(e) => setAiTopic(e.target.value)}
+                    disabled={aiLoading}
+                    className="rounded-lg"
+                  />
+                  <Button
+                    size="sm"
+                    className="w-full rounded-lg"
+                    onClick={handleGenerate}
+                    disabled={aiLoading}
+                  >
+                    {aiLoading ? "Generating…" : "Generate SEO draft"}
+                  </Button>
+                  <div className="text-[11px] text-slate-500">
+                    Fills title, slug, excerpt, tags, and content automatically.
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </div>

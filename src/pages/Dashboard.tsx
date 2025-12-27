@@ -25,6 +25,11 @@ type DashboardData = {
   recentActivity: PostSummary[];
 };
 
+type DomainPulse = {
+  total: number;
+  verified: number;
+};
+
 function PostList({
   title,
   posts,
@@ -74,12 +79,14 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const { activeSite } = useSite();
+  const [domainPulse, setDomainPulse] = useState<DomainPulse>({ total: 0, verified: 0 });
 
   useEffect(() => {
     async function load() {
       if (!activeSite) {
         setLoading(false);
         setData(null);
+        setDomainPulse({ total: 0, verified: 0 });
         return;
       }
       setLoading(true);
@@ -87,6 +94,12 @@ export default function Dashboard() {
       try {
         const res = await api.get("/admin/dashboard");
         setData(res.data);
+        const domRes = await api.get(`/admin/sites/${activeSite.id}/domains`);
+        const domains = (domRes.data?.domains as any[]) ?? [];
+        setDomainPulse({
+          total: domains.length,
+          verified: domains.filter((d) => d.status === "VERIFIED").length,
+        });
       } catch {
         setError("Unable to load dashboard data. Please try again.");
       } finally {
@@ -107,12 +120,10 @@ export default function Dashboard() {
               <Badge variant="secondary" className="bg-white/20 text-white">
                 Dashboard
               </Badge>
-              <h1 className="text-3xl font-semibold leading-tight">
-                Welcome back{data?.admin?.name ? `, ${data.admin.name}` : ""}.
-              </h1>
+              <h1 className="text-3xl font-semibold leading-tight">Sapphire CMS Portal</h1>
               <p className="max-w-2xl text-sm text-white/90">
-                Track your posts for {activeSite?.name ?? "this site"}, see what teammates shipped, and
-                jump back into your work.
+                Welcome{data?.admin?.name ? `, ${data.admin.name}` : ""}. Manage your sites, verify ownership,
+                and publish content that stays yours.
               </p>
               <div className="flex flex-wrap gap-2">
                 <Button asChild className="bg-white text-cyan-700 hover:bg-white/90">
@@ -130,6 +141,9 @@ export default function Dashboard() {
                   {stats.myPublished} published · {stats.myDrafts} drafts
                 </div>
                 <div className="text-xs text-gray-600">Team posts: {stats.teamPosts}</div>
+                <div className="text-xs text-gray-600">
+                  Domains verified: {domainPulse.verified}/{domainPulse.total}
+                </div>
               </div>
             )}
           </div>
@@ -139,6 +153,26 @@ export default function Dashboard() {
           <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
             {error}
           </div>
+        )}
+
+        {!activeSite && (
+          <Card className="border-orange-200 bg-orange-50">
+            <CardContent className="py-4 text-sm text-orange-800">
+              No active site yet. Create one from Sites to start posting and issuing tokens.
+            </CardContent>
+          </Card>
+        )}
+
+        {activeSite && domainPulse.verified === 0 && (
+          <Card className="border-yellow-200 bg-yellow-50">
+            <CardContent className="flex flex-wrap items-center gap-3 py-4 text-sm text-yellow-800">
+              Your domain is not verified yet. Go to Sites, copy the TXT record, and click Verify. Content
+              delivery and tokens are scoped per verified site.
+              <Button asChild size="sm" variant="outline">
+                <Link to="/sites">Go to Sites</Link>
+              </Button>
+            </CardContent>
+          </Card>
         )}
 
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">

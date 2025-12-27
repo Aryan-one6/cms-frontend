@@ -167,6 +167,12 @@ export default function PostsPage() {
 
                   <TableCell className="text-right">
                     <div className="inline-flex gap-2">
+                      <Link to={`/posts/${p.id}`}>
+                        <Button variant="outline" size="sm">
+                          View
+                        </Button>
+                      </Link>
+
                       <Link to={`/posts/${p.id}/edit`}>
                         <Button
                           variant="outline"

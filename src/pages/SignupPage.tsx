@@ -4,6 +4,7 @@ import { useAuth } from "../lib/auth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { api } from "@/lib/api";
 
 export default function SignupPage() {
   const { signup } = useAuth();
@@ -12,6 +13,8 @@ export default function SignupPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [siteName, setSiteName] = useState("");
+  const [domain, setDomain] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -27,7 +30,29 @@ export default function SignupPage() {
         return;
       }
       await signup(name, email, password);
-      navigate("/");
+
+      // After signup, immediately create their first site and domain if provided
+      if (siteName.trim()) {
+        try {
+          const siteRes = await api.post("/admin/sites", {
+            name: siteName.trim(),
+            domains: domain.trim() ? [domain.trim()] : [],
+          });
+          const siteData = siteRes.data;
+
+          if (domain.trim()) {
+            await api
+              .post(`/admin/sites/${siteData.site.id}/domains`, { domain: domain.trim() })
+              .catch(() => {
+              /* non-blocking */
+            });
+          }
+        } catch (err: any) {
+          console.error("Post-signup site setup failed", err);
+        }
+      }
+
+      navigate("/sites");
     } catch (err: any) {
       const message =
         err?.response?.data?.message ||
@@ -43,7 +68,7 @@ export default function SignupPage() {
       <Card className="w-full max-w-md rounded-2xl shadow-sm">
         <CardHeader>
           <CardTitle className="text-lg">Create an account</CardTitle>
-          <p className="text-sm text-slate-500">Invite yourself to the workspace.</p>
+          <p className="text-sm text-slate-500">Create your workspace and set up your site details.</p>
         </CardHeader>
 
         <CardContent>
@@ -71,6 +96,24 @@ export default function SignupPage() {
             >
               {showPassword ? "Hide passwords" : "Show passwords"}
             </button>
+
+            <div className="h-px bg-slate-200" />
+            <div className="space-y-2">
+              <div className="text-sm font-semibold text-slate-800">Your site</div>
+              <Input
+                placeholder="Site name (e.g., Marketing Site)"
+                value={siteName}
+                onChange={(e) => setSiteName(e.target.value)}
+              />
+              <Input
+                placeholder="Primary domain (e.g., example.com)"
+                value={domain}
+                onChange={(e) => setDomain(e.target.value)}
+              />
+              <p className="text-xs text-slate-500">
+                We’ll use this to create your site container and generate a verification token. You can edit later.
+              </p>
+            </div>
 
             {error && <p className="text-sm text-red-600">{error}</p>}
 

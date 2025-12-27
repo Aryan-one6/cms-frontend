@@ -14,9 +14,11 @@ import { buildAssetUrl } from "@/lib/media";
 import type { UploadResponse } from "@/lib/upload";
 import { useAuth } from "../lib/auth";
 import { useSite } from "@/lib/site";
+import { generateSeoDraft } from "@/lib/ai";
 
 type Post = {
   id: string;
+  slug: string;
   title: string;
   excerpt?: string;
   coverImageUrl?: string;
@@ -36,6 +38,8 @@ export default function PostEditPage() {
   const [post, setPost] = useState<Post | null>(null);
 
   const [title, setTitle] = useState("");
+  const [slug, setSlug] = useState("");
+  const [slugDirty, setSlugDirty] = useState(false);
   const [excerpt, setExcerpt] = useState("");
   const [contentHtml, setContentHtml] = useState("<p></p>");
   const [tagsText, setTagsText] = useState("");
@@ -46,6 +50,37 @@ export default function PostEditPage() {
   const [error, setError] = useState("");
   const [canEdit, setCanEdit] = useState(false);
   const readOnly = !canEdit;
+  const [aiTopic, setAiTopic] = useState("");
+  const [aiLoading, setAiLoading] = useState(false);
+
+  function toSlug(value: string) {
+    return value
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)+/g, "");
+  }
+
+  async function handleGenerate() {
+    if (!aiTopic.trim()) {
+      setError("Enter a topic to generate a draft.");
+      return;
+    }
+    setAiLoading(true);
+    setError("");
+    try {
+      const draft = await generateSeoDraft(aiTopic.trim());
+      if (draft.title) setTitle(draft.title);
+      if (draft.slug && !slugDirty) setSlug(draft.slug);
+      if (draft.excerpt) setExcerpt(draft.excerpt);
+      if (draft.contentHtml) setContentHtml(draft.contentHtml);
+      if (draft.tags?.length) setTagsText(draft.tags.join(", "));
+    } catch (err: any) {
+      setError(err?.message || "Failed to generate draft");
+    } finally {
+      setAiLoading(false);
+    }
+  }
 
   async function handleFileChange(e: ChangeEvent<HTMLInputElement>) {
     if (readOnly) {
@@ -75,6 +110,7 @@ export default function PostEditPage() {
 
       setPost(p);
       setTitle(p.title);
+      setSlug(p.slug || "");
       setExcerpt(p.excerpt || "");
       setContentHtml(p.contentHtml || "<p></p>");
       setCoverImageUrl(p.coverImageUrl || "");
@@ -106,6 +142,7 @@ export default function PostEditPage() {
 
       await api.put(`/admin/posts/${id}`, {
         title,
+        slug: slug || toSlug(title),
         excerpt: excerpt || undefined,
         coverImageUrl: coverImageUrl || undefined,
         contentHtml,
@@ -232,17 +269,39 @@ export default function PostEditPage() {
           <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>
         )}
 
-        <div className="grid items-start gap-6 xl:grid-cols-3">
-          <Card className="xl:col-span-2">
+        <div className="grid items-start gap-6 xl:grid-cols-2">
+          <Card className="xl:col-span-1">
             <CardHeader>
               <CardTitle>Content & metadata</CardTitle>
               <CardDescription>Keep the SEO basics strong and content polished.</CardDescription>
             </CardHeader>
             <CardContent>
               <form id="edit-form" onSubmit={handleSave} className="space-y-6">
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-slate-700">Title</label>
+              <Input
+                value={title}
+                onChange={(e) => {
+                      setTitle(e.target.value);
+                      if (!slugDirty) setSlug(toSlug(e.target.value));
+                    }}
+                    required
+                    disabled={readOnly}
+                  />
+                </div>
+
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-700">Title</label>
-                  <Input value={title} onChange={(e) => setTitle(e.target.value)} required disabled={readOnly} />
+                  <label className="text-sm font-medium text-slate-700">Slug</label>
+                  <Input
+                    value={slug}
+                    onChange={(e) => {
+                      setSlug(e.target.value);
+                      setSlugDirty(true);
+                    }}
+                    placeholder="my-awesome-post"
+                    disabled={readOnly}
+                  />
+                  <p className="text-xs text-slate-500">Leave blank to auto-generate from the title.</p>
                 </div>
 
                 <div className="space-y-2">
@@ -306,6 +365,32 @@ export default function PostEditPage() {
           </Card>
 
           <div className="space-y-4 xl:sticky xl:top-6">
+             <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm">AI helper</CardTitle>
+                <CardDescription>Generate an SEO draft from a topic.</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3 text-sm text-slate-600">
+                <Input
+                  placeholder="Topic for SEO draft"
+                  value={aiTopic}
+                  onChange={(e) => setAiTopic(e.target.value)}
+                  disabled={aiLoading}
+                  className="rounded-lg"
+                />
+                <Button
+                  size="sm"
+                  className="w-full rounded-lg"
+                  onClick={handleGenerate}
+                  disabled={aiLoading || readOnly}
+                >
+                  {aiLoading ? "Generating…" : "Generate SEO draft"}
+                </Button>
+                <p className="text-xs text-slate-500">
+                  Fills title, slug, excerpt, tags, and content automatically.
+                </p>
+              </CardContent>
+            </Card>
             <BlogPreview
               title={title}
               excerpt={excerpt}
@@ -349,6 +434,8 @@ export default function PostEditPage() {
                 <p className="text-xs text-slate-500">Save changes before publishing to keep preview in sync.</p>
               </CardContent>
             </Card>
+
+           
           </div>
         </div>
       </div>

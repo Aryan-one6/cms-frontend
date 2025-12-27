@@ -10,6 +10,10 @@ import SignupPage from "./pages/SignupPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import SitesPage from "./pages/SitesPage";
+import NewSitePage from "./pages/NewSitePage";
+import SuperAdminPage from "./pages/SuperAdminPage";
+import PostViewPage from "./pages/PostViewPage";
+
 import { SiteProvider } from "./lib/site";
 
 export default function App() {
@@ -57,6 +61,14 @@ export default function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/posts/:id"
+            element={
+              <ProtectedRoute>
+                <PostViewPage />
+              </ProtectedRoute>
+            }
+          />
 
           <Route
             path="/sites"
@@ -66,6 +78,25 @@ export default function App() {
               </ProtectedRoute>
             }
           />
+
+          <Route
+            path="/sites/new"
+            element={
+              <ProtectedRoute>
+                <NewSitePage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/super-admin"
+            element={
+              <ProtectedRoute>
+                <SuperAdminPage />
+              </ProtectedRoute>
+            }
+          />
+       
 
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>

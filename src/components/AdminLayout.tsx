@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { useAuth } from "../lib/auth";
 import { useSite } from "@/lib/site";
+import { Badge } from "@/components/ui/badge";
 
 function NavItem({ to, label }: { to: string; label: string }) {
   const { pathname } = useLocation();
@@ -29,27 +30,32 @@ function HeaderBar() {
 
   return (
     <header className="border-b border-slate-100 bg-white/90 backdrop-blur">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3">
+      <div className="mx-auto flex flex-wrap items-center justify-between gap-3 px-4 py-3">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-600 text-lg font-semibold text-white">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-900 text-lg font-semibold text-white">
             SC
           </div>
           <div>
-            <div className="text-base font-semibold text-slate-900">Sapphire CMS</div>
+            <div className="flex items-center gap-2">
+              <div className="text-base font-semibold text-slate-900">Sapphire CMS</div>
+              <Badge variant="secondary" className="hidden md:inline-flex">
+                Portal
+              </Badge>
+            </div>
             <div className="text-xs text-slate-500">
-              {activeSite ? `Site: ${activeSite.name}` : "Choose a site"}
+              {activeSite ? `Active: ${activeSite.name}` : "Choose a site"}
             </div>
           </div>
         </div>
 
-        <div className="flex items-center gap-4">
-          <div className="hidden items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 shadow-sm sm:flex">
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="flex items-center gap-2  px-3 py-1.5">
             <label className="text-xs font-medium text-slate-500" htmlFor="site-selector">
-              Active site
+              Active Site
             </label>
             <select
               id="site-selector"
-              className="rounded-md border border-slate-200 bg-white px-2 py-1 text-sm text-slate-800 focus:outline-none"
+              className="rounded-full border border-slate-200  bg-white px-2 py-1 text-sm text-slate-800 focus:outline-none"
               value={activeSite?.id || ""}
               onChange={(e) => selectSite(e.target.value)}
             >
@@ -62,18 +68,18 @@ function HeaderBar() {
                 </option>
               ))}
             </select>
-            <Button asChild variant="ghost" size="sm">
-              <Link to="/sites">Manage</Link>
-            </Button>
+           
           </div>
           <nav className="hidden items-center gap-2 md:flex">
             <NavItem to="/" label="Dashboard" />
-            <NavItem to="/posts" label="Blog Posts" />
+            <NavItem to="/posts" label="Posts" />
             <NavItem to="/sites" label="Sites" />
+            {admin?.role === "SUPER_ADMIN" ? <NavItem to="/super-admin" label="Super Admin" /> : null}
+            
           </nav>
-          <Separator orientation="vertical" className="h-6" />
+          <Separator orientation="vertical" className="hidden h-6 md:block" />
           <div className="flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-cyan-600 text-white">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-900 text-white">
               {admin?.name?.[0]?.toUpperCase() ?? "A"}
             </div>
             <div className="hidden text-sm leading-tight text-slate-700 sm:block">
@@ -94,7 +100,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   return (
     <div className="min-h-screen bg-slate-50">
       <HeaderBar />
-      <div className="mx-auto max-w-7xl px-4 py-8">
+      <div className="mx-auto  px-4 py-8">
         <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">{children}</div>
       </div>
     </div>

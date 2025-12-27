@@ -26,8 +26,11 @@ type SiteContextValue = {
   activeSiteId: string | null;
   loading: boolean;
   selectSite: (siteId: string) => void;
-  refreshSites: () => Promise<void>;
-  createSite: (data: { name: string; domains?: string[]; defaultLocale?: string }) => Promise<void>;
+  refreshSites: () => Promise<Site[]>;
+  createSite: (
+    data: { name: string; domain?: string; domains?: string[]; defaultLocale?: string }
+  ) => Promise<string | undefined>;
+  deleteSite: (siteId: string) => Promise<void>;
 };
 
 const SiteContext = createContext<SiteContextValue>(null!);
@@ -53,7 +56,7 @@ export function SiteProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  async function refreshSites() {
+  async function refreshSites(): Promise<Site[]> {
     setLoading(true);
     try {
       const res = await api.get("/admin/sites");
@@ -66,19 +69,54 @@ export function SiteProvider({ children }: { children: React.ReactNode }) {
         setActiveSiteId(null);
         if (typeof window !== "undefined") localStorage.removeItem(SITE_STORAGE_KEY);
       }
+      return newSites;
     } catch (err) {
       console.error("Failed to load sites", err);
       setSites([]);
+      return [];
     } finally {
       setLoading(false);
     }
   }
 
-  async function createSite(data: { name: string; domains?: string[]; defaultLocale?: string }) {
-    const res = await api.post("/admin/sites", data);
+  async function createSite(
+    data: { name: string; domain?: string; domains?: string[]; defaultLocale?: string }
+  ): Promise<string | undefined> {
+    const payload = {
+      name: data.name,
+      domains: data.domain ? [data.domain] : data.domains ?? [],
+      defaultLocale: data.defaultLocale,
+    };
+
+    const res = await api.post("/admin/sites", payload);
     const newId = res.data.site?.id as string | undefined;
     await refreshSites();
+
+    // ensure a siteDomain is created so verification can proceed
+    if (newId && data.domain) {
+      try {
+        await api.post(`/admin/sites/${newId}/domains`, { domain: data.domain });
+      } catch (err) {
+        console.error("Failed to add domain during site creation", err);
+        throw err;
+      }
+    }
+
     if (newId) selectSite(newId);
+    return newId;
+  }
+
+  async function deleteSite(siteId: string) {
+    await api.delete(`/admin/sites/${siteId}`);
+    const newSites = await refreshSites();
+    if (!newSites.length) {
+      setActiveSiteId(null);
+      if (typeof window !== "undefined") localStorage.removeItem(SITE_STORAGE_KEY);
+      return;
+    }
+    if (!newSites.some((s) => s.id === activeSiteId)) {
+      selectSite(newSites[0].id);
+    }
   }
 
   useEffect(() => {
@@ -102,6 +140,7 @@ export function SiteProvider({ children }: { children: React.ReactNode }) {
         selectSite,
         refreshSites,
         createSite,
+        deleteSite,
       }}
     >
       {children}
