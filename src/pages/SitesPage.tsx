@@ -24,7 +24,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useSite } from "@/lib/site";
-import { api, SITE_STORAGE_KEY } from "@/lib/api";
+import { api } from "@/lib/api";
 import {
   CheckCircle2,
   Globe,
@@ -114,10 +114,9 @@ function StatusBadge({ status }: { status: Domain["status"] }) {
 }
 
 export default function SitesPage() {
-  const { sites, activeSite, selectSite, createSite, refreshSites, deleteSite } = useSite();
+  const { sites, activeSite, selectSite,  deleteSite } = useSite();
 
-  const [newSiteName, setNewSiteName] = useState("");
-  const [newSiteDomain, setNewSiteDomain] = useState("");
+
   const [tokenName, setTokenName] = useState("");
   const [tokenRole, setTokenRole] = useState<Token["role"]>("READ_ONLY");
   const [tokens, setTokens] = useState<Token[]>([]);
@@ -690,9 +689,9 @@ export default function SitesPage() {
                                 </div>
 
                                 <div className="flex flex-wrap gap-2">
-                                 
 
-                                  
+
+
 
                                   <Button
                                     size="sm"
@@ -743,7 +742,7 @@ export default function SitesPage() {
                   {/* TOKENS */}
                   <TabsContent value="tokens" className="mt-4">
                     <div className="grid gap-4 ">
-                        {/* CREATE */}
+                      {/* CREATE */}
                       <div className="rounded-2xl border border-cyan-200 bg-linear-to-b from-cyan-50 to-white p-4 shadow-sm">
                         <div className="flex items-center gap-2">
                           <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-cyan-600 text-white">
@@ -760,38 +759,38 @@ export default function SitesPage() {
                         <div className="space-y-3">
                           <div className="space-y-1 md:grid md:grid-cols-2 space-x-3.5">
                             <div>
-                            <label className="text-xs font-medium text-slate-700" htmlFor="token-name">
-                              Token name
-                            </label>
-                            <Input
-                              id="token-name"
-                              placeholder="Production site token"
-                              value={tokenName}
-                              onChange={(e) => setTokenName(e.target.value)}
-                              className="rounded-xl border-cyan-200 bg-white"
-                            />
-                          </div>
-
-                          <div className="space-y-1">
-                            <label className="text-xs font-medium text-slate-700" htmlFor="token-role">
-                              Role
-                            </label>
-                            <select
-                              id="token-role"
-                              className="w-full rounded-xl border border-cyan-200 bg-white px-3 py-2 text-sm"
-                              value={tokenRole}
-                              onChange={(e) => setTokenRole(e.target.value as Token["role"])}
-                            >
-                              <option value="READ_ONLY">Read only</option>
-                              <option value="READ_WRITE">Read & write</option>
-                            </select>
-                            
-                          </div>
-                          
-                          </div>
-<div className="text-[12px] text-slate-600">
-                              Use <b>Read only</b> for public fetch. Use <b>Read & write</b> only for trusted servers.
+                              <label className="text-xs font-medium text-slate-700" htmlFor="token-name">
+                                Token name
+                              </label>
+                              <Input
+                                id="token-name"
+                                placeholder="Production site token"
+                                value={tokenName}
+                                onChange={(e) => setTokenName(e.target.value)}
+                                className="rounded-xl border-cyan-200 bg-white"
+                              />
                             </div>
+
+                            <div className="space-y-1">
+                              <label className="text-xs font-medium text-slate-700" htmlFor="token-role">
+                                Role
+                              </label>
+                              <select
+                                id="token-role"
+                                className="w-full rounded-xl border border-cyan-200 bg-white px-3 py-2 text-sm"
+                                value={tokenRole}
+                                onChange={(e) => setTokenRole(e.target.value as Token["role"])}
+                              >
+                                <option value="READ_ONLY">Read only</option>
+                                <option value="READ_WRITE">Read & write</option>
+                              </select>
+
+                            </div>
+
+                          </div>
+                          <div className="text-[12px] text-slate-600">
+                            Use <b>Read only</b> for public fetch. Use <b>Read & write</b> only for trusted servers.
+                          </div>
                           <Button
                             className="w-full rounded-xl bg-cyan-600 hover:bg-cyan-700"
                             onClick={handleCreateToken}
@@ -807,7 +806,7 @@ export default function SitesPage() {
                             </div>
                           ) : null}
 
-                         
+
                         </div>
                       </div>
                       {/* LIST */}
@@ -890,7 +889,7 @@ export default function SitesPage() {
                         )}
                       </div>
 
-                    
+
                     </div>
                   </TabsContent>
                 </Tabs>
@@ -972,110 +971,110 @@ export default function SitesPage() {
             {/* EMBED GUIDE */}
 
           </div>
-       
+
         </div>
-           <Card className="border-slate-100">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base font-semibold text-slate-900">Embed & API guide</CardTitle>
-              <CardDescription>Minimal, copy-paste examples.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3 text-sm text-slate-700">
-              <div className="rounded-2xl border border-slate-200 bg-white p-4">
-                <div className="text-xs font-semibold uppercase text-slate-500">Fetch posts</div>
-                <pre className="mt-2 overflow-auto rounded-xl bg-slate-50 p-3 text-xs text-slate-800 border border-slate-100">
-                  {`const res = await fetch("${import.meta.env.VITE_API_BASE || "https://your-api.com/api"}/public/posts?siteId=${activeSite?.id ?? "<site-id>"}", {
+        <Card className="border-slate-100">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base font-semibold text-slate-900">Embed & API guide</CardTitle>
+            <CardDescription>Minimal, copy-paste examples.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3 text-sm text-slate-700">
+            <div className="rounded-2xl border border-slate-200 bg-white p-4">
+              <div className="text-xs font-semibold uppercase text-slate-500">Fetch posts</div>
+              <pre className="mt-2 overflow-auto rounded-xl bg-slate-50 p-3 text-xs text-slate-800 border border-slate-100">
+                {`const res = await fetch("${import.meta.env.VITE_API_BASE || "https://your-api.com/api"}/public/posts?siteId=${activeSite?.id ?? "<site-id>"}", {
   headers: { "X-Site-Token": "${plainToken || "<your-site-token>"}" }
 });
 const { posts } = await res.json();`}
-                </pre>
-                <div className="mt-2 text-xs text-slate-600">
-                  Replace <code className="rounded bg-slate-100 px-1.5 py-0.5">&lt;your-site-token&gt;</code>{" "}
-                  with a token you created.
-                </div>
+              </pre>
+              <div className="mt-2 text-xs text-slate-600">
+                Replace <code className="rounded bg-slate-100 px-1.5 py-0.5">&lt;your-site-token&gt;</code>{" "}
+                with a token you created.
               </div>
+            </div>
 
-              <div className="rounded-2xl border border-slate-200 bg-white p-4">
-                <div className="text-xs font-semibold uppercase text-slate-500">Single post by slug</div>
-                <pre className="mt-2 overflow-auto rounded-xl bg-slate-50 p-3 text-xs text-slate-800 border border-slate-100">
-                  {`await fetch("${import.meta.env.VITE_API_BASE || "https://your-api.com/api"}/public/posts/my-slug?siteId=${activeSite?.id ?? "<site-id>"}", {
+            <div className="rounded-2xl border border-slate-200 bg-white p-4">
+              <div className="text-xs font-semibold uppercase text-slate-500">Single post by slug</div>
+              <pre className="mt-2 overflow-auto rounded-xl bg-slate-50 p-3 text-xs text-slate-800 border border-slate-100">
+                {`await fetch("${import.meta.env.VITE_API_BASE || "https://your-api.com/api"}/public/posts/my-slug?siteId=${activeSite?.id ?? "<site-id>"}", {
   headers: { "X-Site-Token": "${plainToken || "<your-site-token>"}" }
 });`}
-                </pre>
-              </div>
+              </pre>
+            </div>
 
-              <div className="rounded-2xl border border-cyan-200 bg-cyan-50 p-4">
-                <div className="text-xs font-semibold uppercase text-cyan-900">Setup checklist</div>
-                <ol className="mt-2 list-decimal space-y-1 pl-4 text-xs text-cyan-900/90">
-                  <li>Create a site and add your domain.</li>
-                  <li>Add DNS TXT (or host the HTML file) and click Verify.</li>
-                  <li>Create a token and store it securely.</li>
-                  <li>Use <code className="rounded bg-white/70 px-1.5 py-0.5">siteId</code> +{" "}
-                    <code className="rounded bg-white/70 px-1.5 py-0.5">X-Site-Token</code> in your requests.</li>
-                </ol>
-              </div>
+            <div className="rounded-2xl border border-cyan-200 bg-cyan-50 p-4">
+              <div className="text-xs font-semibold uppercase text-cyan-900">Setup checklist</div>
+              <ol className="mt-2 list-decimal space-y-1 pl-4 text-xs text-cyan-900/90">
+                <li>Create a site and add your domain.</li>
+                <li>Add DNS TXT (or host the HTML file) and click Verify.</li>
+                <li>Create a token and store it securely.</li>
+                <li>Use <code className="rounded bg-white/70 px-1.5 py-0.5">siteId</code> +{" "}
+                  <code className="rounded bg-white/70 px-1.5 py-0.5">X-Site-Token</code> in your requests.</li>
+              </ol>
+            </div>
 
-              {!isOwner && activeSite ? (
-                <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-xs text-amber-900">
-                  <div className="flex items-start gap-2">
-                    <AlertTriangle className="mt-0.5 h-4 w-4" />
-                    <div>
-                      <div className="font-semibold">Limited permissions</div>
-                      <div className="mt-1 opacity-90">
-                        You’re not an OWNER on this site. Some actions like delete/refresh may be disabled.
-                      </div>
+            {!isOwner && activeSite ? (
+              <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-xs text-amber-900">
+                <div className="flex items-start gap-2">
+                  <AlertTriangle className="mt-0.5 h-4 w-4" />
+                  <div>
+                    <div className="font-semibold">Limited permissions</div>
+                    <div className="mt-1 opacity-90">
+                      You’re not an OWNER on this site. Some actions like delete/refresh may be disabled.
                     </div>
                   </div>
                 </div>
-              ) : null}
-            </CardContent>
-          </Card>
+              </div>
+            ) : null}
+          </CardContent>
+        </Card>
 
-          {/* CONFIRM: DELETE DOMAIN */}
-          <AlertDialog
-            open={Boolean(deleteDomainTarget)}
-            onOpenChange={(open) => !open && setDeleteDomainTarget(null)}
-          >
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Delete domain?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  This removes the TXT token and verification for{" "}
-                  <strong>{deleteDomainTarget?.domain}</strong>. You will need to re-verify if you add it again.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction
-                  className="bg-red-600 hover:bg-red-700"
-                  onClick={() => deleteDomainTarget && handleDeleteDomainConfirmed(deleteDomainTarget.id)}
-                >
-                  Delete
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+        {/* CONFIRM: DELETE DOMAIN */}
+        <AlertDialog
+          open={Boolean(deleteDomainTarget)}
+          onOpenChange={(open) => !open && setDeleteDomainTarget(null)}
+        >
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete domain?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This removes the TXT token and verification for{" "}
+                <strong>{deleteDomainTarget?.domain}</strong>. You will need to re-verify if you add it again.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                className="bg-red-600 hover:bg-red-700"
+                onClick={() => deleteDomainTarget && handleDeleteDomainConfirmed(deleteDomainTarget.id)}
+              >
+                Delete
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
 
-          {/* CONFIRM: DELETE SITE */}
-          <AlertDialog open={deleteSiteOpen} onOpenChange={setDeleteSiteOpen}>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Delete site?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  This will delete the site {activeSite?.name ?? ""}, its domains, tokens, and posts. This action
-                  cannot be undone.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction
-                  className="bg-red-600 hover:bg-red-700"
-                  onClick={handleDeleteSiteConfirmed}
-                >
-                  Delete site
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+        {/* CONFIRM: DELETE SITE */}
+        <AlertDialog open={deleteSiteOpen} onOpenChange={setDeleteSiteOpen}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete site?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This will delete the site {activeSite?.name ?? ""}, its domains, tokens, and posts. This action
+                cannot be undone.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                className="bg-red-600 hover:bg-red-700"
+                onClick={handleDeleteSiteConfirmed}
+              >
+                Delete site
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </AdminLayout>
   );
