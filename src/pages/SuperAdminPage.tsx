@@ -44,7 +44,6 @@ export default function SuperAdminPage() {
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [sites, setSites] = useState<SiteRow[]>([]);
   const [posts, setPosts] = useState<PostRow[]>([]);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   const [newUser, setNewUser] = useState({ name: "", email: "", password: "", role: "EDITOR" as "EDITOR" | "SUPER_ADMIN" });
@@ -55,41 +54,32 @@ export default function SuperAdminPage() {
   const activeSites = useMemo(() => sites.filter((s) => s.status === "ACTIVE").length, [sites]);
 
   async function loadUsers() {
-    setLoading(true);
     setError("");
     try {
       const res = await api.get("/super-admin/users");
       setUsers(res.data.users);
     } catch {
       setError("Unable to load users.");
-    } finally {
-      setLoading(false);
     }
   }
 
   async function loadSites() {
-    setLoading(true);
     setError("");
     try {
       const res = await api.get("/super-admin/sites");
       setSites(res.data.sites);
     } catch {
       setError("Unable to load sites.");
-    } finally {
-      setLoading(false);
     }
   }
 
   async function loadPosts() {
-    setLoading(true);
     setError("");
     try {
       const res = await api.get("/super-admin/posts");
       setPosts(res.data.posts);
     } catch {
       setError("Unable to load posts.");
-    } finally {
-      setLoading(false);
     }
   }
 

@@ -31,7 +31,6 @@ import {
   KeyRound,
   ShieldCheck,
   Copy,
-  RefreshCw,
   Trash2,
   Plus,
   AlertTriangle,
@@ -180,43 +179,43 @@ export default function SitesPage() {
     }
   }
 
-  async function handleCreateSite() {
-    if (!newSiteName.trim()) {
-      setError("Enter a site name to create one.");
-      return;
-    }
-    if (!newSiteDomain.trim()) {
-      setError("Enter a primary domain so we can generate the TXT record immediately.");
-      return;
-    }
+  // async function handleCreateSite() {
+  //   if (!newSiteName.trim()) {
+  //     setError("Enter a site name to create one.");
+  //     return;
+  //   }
+  //   if (!newSiteDomain.trim()) {
+  //     setError("Enter a primary domain so we can generate the TXT record immediately.");
+  //     return;
+  //   }
 
-    setError("");
-    setNotice("");
+  //   setError("");
+  //   setNotice("");
 
-    await createSite({ name: newSiteName.trim(), domain: newSiteDomain.trim() });
-    const updatedSites = await refreshSites();
-    const storedId = typeof window !== "undefined" ? localStorage.getItem(SITE_STORAGE_KEY) : null;
-    const matchedNew =
-      updatedSites.find(
-        (s) =>
-          s.name === newSiteName.trim() ||
-          s.siteDomains?.some((d) => d.domain === newSiteDomain.trim())
-      )?.id || null;
-    const nextSiteId = storedId || matchedNew || updatedSites[0]?.id || null;
+  //   await createSite({ name: newSiteName.trim(), domain: newSiteDomain.trim() });
+  //   const updatedSites = await refreshSites();
+  //   const storedId = typeof window !== "undefined" ? localStorage.getItem(SITE_STORAGE_KEY) : null;
+  //   const matchedNew =
+  //     updatedSites.find(
+  //       (s) =>
+  //         s.name === newSiteName.trim() ||
+  //         s.siteDomains?.some((d) => d.domain === newSiteDomain.trim())
+  //     )?.id || null;
+  //   const nextSiteId = storedId || matchedNew || updatedSites[0]?.id || null;
 
-    if (nextSiteId && nextSiteId !== activeSite?.id) {
-      selectSite(nextSiteId);
-      await loadTokens(nextSiteId);
-      await loadDomains(nextSiteId);
-    } else {
-      await loadTokens(nextSiteId ?? activeSite?.id ?? null);
-      await loadDomains(nextSiteId ?? activeSite?.id ?? null);
-    }
+  //   if (nextSiteId && nextSiteId !== activeSite?.id) {
+  //     selectSite(nextSiteId);
+  //     await loadTokens(nextSiteId);
+  //     await loadDomains(nextSiteId);
+  //   } else {
+  //     await loadTokens(nextSiteId ?? activeSite?.id ?? null);
+  //     await loadDomains(nextSiteId ?? activeSite?.id ?? null);
+  //   }
 
-    setNewSiteName("");
-    setNewSiteDomain("");
-    setNotice("Site created. TXT record generated for your domain—verify it right away.");
-  }
+  //   setNewSiteName("");
+  //   setNewSiteDomain("");
+  //   setNotice("Site created. TXT record generated for your domain—verify it right away.");
+  // }
 
   async function handleDeleteSiteConfirmed() {
     if (!activeSite) return;
@@ -341,16 +340,7 @@ export default function SitesPage() {
     }
   }
 
-  async function refreshDomainToken(domainId: string) {
-    if (!activeSite) return;
-    try {
-      await api.post(`/admin/sites/${activeSite.id}/domains/${domainId}/refresh-token`);
-      await loadDomains();
-      setNotice("Domain token refreshed.");
-    } catch {
-      setError("Unable to refresh token.");
-    }
-  }
+
 
   async function handleDeleteDomainConfirmed(domainId: string) {
     if (!activeSite) return;
@@ -418,7 +408,7 @@ export default function SitesPage() {
     <AdminLayout>
       <div className="space-y-6">
         {/* TOP BAR */}
-        <div className="overflow-hidden rounded-2xl border border-cyan-200 bg-gradient-to-r from-cyan-700 via-cyan-600 to-sky-600 text-white shadow">
+        <div className="overflow-hidden rounded-2xl border border-cyan-200 bg-linear-to-r from-cyan-700 via-cyan-600 to-sky-600 text-white shadow">
           <div className="px-6 py-5">
             <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
               <div className="space-y-2">
@@ -462,7 +452,7 @@ export default function SitesPage() {
               <div className="flex flex-col gap-2 lg:items-end">
                 <div className="flex flex-wrap gap-2">
                   <select
-                    className="min-w-[220px] rounded-xl border border-white/30 bg-white/10 px-3 py-2 text-sm text-white outline-none ring-0 focus:border-white/50"
+                    className="min-w-55 rounded-xl border border-white/30 bg-white/10 px-3 py-2 text-sm text-white outline-none ring-0 focus:border-white/50"
                     value={activeSite?.id || ""}
                     onChange={(e) => selectSite(e.target.value)}
                   >
@@ -754,7 +744,7 @@ export default function SitesPage() {
                   <TabsContent value="tokens" className="mt-4">
                     <div className="grid gap-4 ">
                         {/* CREATE */}
-                      <div className="rounded-2xl border border-cyan-200 bg-gradient-to-b from-cyan-50 to-white p-4 shadow-sm">
+                      <div className="rounded-2xl border border-cyan-200 bg-linear-to-b from-cyan-50 to-white p-4 shadow-sm">
                         <div className="flex items-center gap-2">
                           <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-cyan-600 text-white">
                             <KeyRound className="h-4 w-4" />
