@@ -90,14 +90,16 @@ export default function PostCreatePage() {
   const coverFullUrl = buildAssetUrl(coverImageUrl);
 
   async function handleGenerate() {
-    if (!aiTopic.trim()) {
-      setError("Enter a topic to generate a draft.");
+    const topic = (aiTopic || title).trim();
+    if (!topic) {
+      setError("Enter a topic or starter title to generate a draft.");
       return;
     }
+    if (!aiTopic.trim()) setAiTopic(topic);
     setAiLoading(true);
     setError("");
     try {
-      const draft = await generateSeoDraft(aiTopic.trim());
+      const draft = await generateSeoDraft(topic);
       if (draft.title) setTitle(draft.title);
       if (draft.slug && !slugDirty) setSlug(draft.slug);
       if (draft.excerpt) setExcerpt(draft.excerpt);
@@ -116,6 +118,15 @@ export default function PostCreatePage() {
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="space-y-1">
             <p className="text-sm uppercase tracking-wide text-slate-400">Compose</p>
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm">Publishing tips</CardTitle>
+                <CardDescription>Use tags for discovery and keep the excerpt concise.</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3 text-xs text-slate-500">
+                <div>Preview updates automatically while you type. Publish as a draft now and finalize later.</div>
+              </CardContent>
+            </Card>
             <h1 className="text-2xl font-semibold text-slate-900">Create new post</h1>
             <p className="text-sm text-slate-500">Draft your article, add metadata, and preview it live.</p>
           </div>
@@ -141,6 +152,29 @@ export default function PostCreatePage() {
             </CardHeader>
             <CardContent>
               <form id="post-form" onSubmit={handleCreate} className="space-y-6">
+                <div className="space-y-2 rounded-lg border border-slate-200 bg-slate-50 p-4">
+                  <div className="flex flex-wrap items-center gap-3">
+                    <Input
+                      value={aiTopic}
+                      onChange={(e) => setAiTopic(e.target.value)}
+                      placeholder="Topic or keywords for AI draft"
+                      disabled={aiLoading}
+                      className="min-w-[240px] flex-1 rounded-md"
+                    />
+                    <Button
+                      type="button"
+                      onClick={handleGenerate}
+                      disabled={aiLoading}
+                      className="whitespace-nowrap"
+                    >
+                      {aiLoading ? "Generating…" : "Generate content"}
+                    </Button>
+                  </div>
+                  <p className="text-xs text-slate-500">
+                    Fills all fields with an AI draft (title up to 12 words, excerpt up to 40 words, up to 6 tags).
+                  </p>
+                </div>
+
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-slate-700">Title</label>
                   <Input
@@ -234,38 +268,7 @@ export default function PostCreatePage() {
               tags={tagList}
             />
 
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm">Publishing tips</CardTitle>
-                <CardDescription>Use tags for discovery and keep the excerpt concise.</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-3 text-xs text-slate-500">
-                <div>
-                  Preview updates automatically while you type. Publish as a draft now and finalize later.
-                </div>
-                <div className="space-y-2 rounded-xl border border-slate-200 bg-slate-50 p-3">
-                  <div className="text-[11px] font-semibold text-slate-700">AI helper</div>
-                  <Input
-                    placeholder="Topic for SEO draft"
-                    value={aiTopic}
-                    onChange={(e) => setAiTopic(e.target.value)}
-                    disabled={aiLoading}
-                    className="rounded-lg"
-                  />
-                  <Button
-                    size="sm"
-                    className="w-full rounded-lg"
-                    onClick={handleGenerate}
-                    disabled={aiLoading}
-                  >
-                    {aiLoading ? "Generating…" : "Generate SEO draft"}
-                  </Button>
-                  <div className="text-[11px] text-slate-500">
-                    Fills title, slug, excerpt, tags, and content automatically.
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+           
           </div>
         </div>
       </div>
