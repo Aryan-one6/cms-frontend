@@ -26,10 +26,69 @@ type Post = {
   canEdit: boolean;
 };
 
+function parseCsv(text: string) {
+  const rows: string[][] = [];
+  let current = "";
+  let field: string[] = [];
+  let inQuotes = false;
+
+  const pushField = () => {
+    field.push(current.replace(/""/g, '"'));
+    current = "";
+  };
+  const pushRow = () => {
+    if (field.length) rows.push(field);
+    field = [];
+  };
+
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (ch === '"') {
+      if (inQuotes && text[i + 1] === '"') {
+        current += '"';
+        i++;
+      } else {
+        inQuotes = !inQuotes;
+      }
+    } else if (ch === "," && !inQuotes) {
+      pushField();
+    } else if ((ch === "\n" || ch === "\r") && !inQuotes) {
+      if (ch === "\r" && text[i + 1] === "\n") i++;
+      pushField();
+      pushRow();
+    } else {
+      current += ch;
+    }
+  }
+  pushField();
+  pushRow();
+
+  if (!rows.length) return [];
+  const headers = rows[0].map((h) => h.trim().toLowerCase());
+  return rows
+    .slice(1)
+    .filter((r) => r.some((c) => c.trim().length))
+    .map((cols) => {
+      const obj: any = {};
+      headers.forEach((h, idx) => {
+        const val = (cols[idx] ?? "").trim();
+        if (h === "tags") obj.tags = val ? val.split("|").map((t) => t.trim()).filter(Boolean) : [];
+        else obj[h] = val;
+      });
+      return obj;
+    });
+}
+
 export default function PostsPage() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
+  const [exporting, setExporting] = useState(false);
+  const [exportingCsv, setExportingCsv] = useState(false);
+  const [importing, setImporting] = useState(false);
+  const [importError, setImportError] = useState("");
+  const fileInputId = "import-posts-input";
   const { activeSite } = useSite();
 
   async function loadPosts() {
@@ -84,9 +143,92 @@ export default function PostsPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeSite?.id]);
 
+  const makeFileName = (ext: string) => {
+    const label =
+      activeSite?.domains?.[0] ||
+      activeSite?.slug ||
+      activeSite?.name?.toLowerCase().replace(/\s+/g, "-") ||
+      "site";
+    const stamp = new Date().toISOString().slice(0, 10);
+    return `${label}-posts-${stamp}.${ext}`;
+  };
+
+  async function handleExport() {
+    if (!activeSite) return;
+    setExporting(true);
+    setMessage("");
+    setError("");
+    try {
+      const res = await api.get("/admin/posts/export");
+      const blob = new Blob([JSON.stringify(res.data, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      const stamp = makeFileName("json");
+      a.href = url;
+      a.download = stamp;
+      a.click();
+      URL.revokeObjectURL(url);
+      setMessage("Export ready. Downloaded posts-export file.");
+    } catch {
+      setError("Unable to export posts right now.");
+    } finally {
+      setExporting(false);
+    }
+  }
+
+  async function handleExportCsv() {
+    if (!activeSite) return;
+    setExportingCsv(true);
+    setMessage("");
+    setError("");
+    try {
+      const res = await api.get("/admin/posts/export?format=csv", { responseType: "blob" });
+      const url = URL.createObjectURL(res.data);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = makeFileName("csv");
+      a.click();
+      URL.revokeObjectURL(url);
+      setMessage("Export ready. Downloaded CSV file.");
+    } catch {
+      setError("Unable to export CSV right now.");
+    } finally {
+      setExportingCsv(false);
+    }
+  }
+
+  async function handleImport(file: File | undefined) {
+    if (!file) return;
+    setImporting(true);
+    setImportError("");
+    setMessage("");
+    try {
+      const text = await file.text();
+      let payload: any;
+      if (file.name.toLowerCase().endsWith(".csv")) {
+        payload = { posts: parseCsv(text) };
+      } else {
+        const parsed = JSON.parse(text);
+        payload = Array.isArray(parsed) ? { posts: parsed } : parsed;
+      }
+      if (!payload?.posts || !Array.isArray(payload.posts) || !payload.posts.length) {
+        throw new Error("File must contain an array of posts or { posts: [...] }");
+      }
+      await api.post("/admin/posts/import", payload);
+      setMessage(`Imported ${payload.posts.length} posts (duplicates get unique slugs).`);
+      await loadPosts();
+    } catch (err: any) {
+      setImportError(err?.message || "Unable to import posts. Ensure the JSON format is correct.");
+    } finally {
+      setImporting(false);
+      const input = document.getElementById(fileInputId) as HTMLInputElement | null;
+      if (input) input.value = "";
+    }
+  }
+
   return (
     <AdminLayout>
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div>
           <h2 className="text-xl font-semibold">Blog Posts</h2>
           <p className="text-sm text-slate-500">
@@ -94,14 +236,48 @@ export default function PostsPage() {
           </p>
         </div>
 
-        <Link to="/posts/new">
-          <Button>Create Post</Button>
-        </Link>
+        <div className="flex flex-wrap items-center gap-2">
+          <input
+            id={fileInputId}
+            type="file"
+            accept="application/json,text/csv"
+            className="hidden"
+            onChange={(e) => handleImport(e.target.files?.[0])}
+          />
+          <Button variant="outline" onClick={handleExport} disabled={exporting}>
+            {exporting ? "Exporting..." : "Export posts"}
+          </Button>
+          <Button variant="outline" onClick={handleExportCsv} disabled={exportingCsv}>
+            {exportingCsv ? "Exporting CSV..." : "Export CSV"}
+          </Button>
+          <Button
+            variant="secondary"
+            onClick={() => document.getElementById(fileInputId)?.click()}
+            disabled={importing}
+          >
+            {importing ? "Importing..." : "Import posts"}
+          </Button>
+          <Link to="/posts/new">
+            <Button>Create Post</Button>
+          </Link>
+        </div>
       </div>
 
       {error && (
         <div className="mt-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
           {error}
+        </div>
+      )}
+
+      {message && (
+        <div className="mt-3 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
+          {message}
+        </div>
+      )}
+
+      {importError && (
+        <div className="mt-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          {importError}
         </div>
       )}
 
