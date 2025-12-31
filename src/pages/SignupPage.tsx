@@ -4,7 +4,6 @@ import { useAuth } from "../lib/auth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { api } from "@/lib/api";
 
 export default function SignupPage() {
   const { signup } = useAuth();
@@ -29,28 +28,13 @@ export default function SignupPage() {
         setLoading(false);
         return;
       }
-      await signup(name, email, password);
-
-      // After signup, immediately create their first site and domain if provided
-      if (siteName.trim()) {
-        try {
-          const siteRes = await api.post("/admin/sites", {
-            name: siteName.trim(),
-            domains: domain.trim() ? [domain.trim()] : [],
-          });
-          const siteData = siteRes.data;
-
-          if (domain.trim()) {
-            await api
-              .post(`/admin/sites/${siteData.site.id}/domains`, { domain: domain.trim() })
-              .catch(() => {
-              /* non-blocking */
-            });
-          }
-        } catch (err: any) {
-          console.error("Post-signup site setup failed", err);
-        }
+      if (!siteName.trim() || !domain.trim()) {
+        setError("Site name and primary domain are required to finish setup.");
+        setLoading(false);
+        return;
       }
+
+      await signup(name, email, password, siteName.trim(), domain.trim());
 
       navigate("/sites");
     } catch (err: any) {
@@ -104,11 +88,13 @@ export default function SignupPage() {
                 placeholder="Site name (e.g., Marketing Site)"
                 value={siteName}
                 onChange={(e) => setSiteName(e.target.value)}
+                required
               />
               <Input
                 placeholder="Primary domain (e.g., example.com)"
                 value={domain}
                 onChange={(e) => setDomain(e.target.value)}
+                required
               />
               <p className="text-xs text-slate-500">
                 We’ll use this to create your site container and generate a verification token. You can edit later.

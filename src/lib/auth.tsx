@@ -12,7 +12,7 @@ type AuthContextType = {
   admin: Admin | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  signup: (name: string, email: string, password: string) => Promise<void>;
+  signup: (name: string, email: string, password: string, siteName: string, domain: string) => Promise<void>;
   requestPasswordReset: (email: string) => Promise<void>;
   resetPassword: (token: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
@@ -40,8 +40,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await fetchMe();
   }
 
-  async function signup(name: string, email: string, password: string) {
-    await api.post("/auth/signup", { name, email, password });
+  async function signup(name: string, email: string, password: string, siteName: string, domain: string) {
+    await api.post("/auth/signup", { name, email, password, siteName, domain });
     await fetchMe();
   }
 

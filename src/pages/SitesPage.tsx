@@ -40,6 +40,7 @@ import {
 type Token = {
   id: string;
   name: string;
+  plain: string;
   role: "READ_ONLY" | "READ_WRITE";
   expiresAt?: string | null;
   lastUsedAt?: string | null;
@@ -146,6 +147,7 @@ export default function SitesPage() {
     const siteId = targetSiteId ?? activeSite?.id;
     if (!siteId) {
       setTokens([]);
+      setPlainToken("");
       return;
     }
     setTokenLoading(true);
@@ -155,6 +157,8 @@ export default function SitesPage() {
       setTokens(res.data.tokens);
     } catch {
       setError("Unable to load API tokens for this site.");
+      setTokens([]);
+      setPlainToken("");
     } finally {
       setTokenLoading(false);
     }
@@ -178,43 +182,6 @@ export default function SitesPage() {
     }
   }
 
-  // async function handleCreateSite() {
-  //   if (!newSiteName.trim()) {
-  //     setError("Enter a site name to create one.");
-  //     return;
-  //   }
-  //   if (!newSiteDomain.trim()) {
-  //     setError("Enter a primary domain so we can generate the TXT record immediately.");
-  //     return;
-  //   }
-
-  //   setError("");
-  //   setNotice("");
-
-  //   await createSite({ name: newSiteName.trim(), domain: newSiteDomain.trim() });
-  //   const updatedSites = await refreshSites();
-  //   const storedId = typeof window !== "undefined" ? localStorage.getItem(SITE_STORAGE_KEY) : null;
-  //   const matchedNew =
-  //     updatedSites.find(
-  //       (s) =>
-  //         s.name === newSiteName.trim() ||
-  //         s.siteDomains?.some((d) => d.domain === newSiteDomain.trim())
-  //     )?.id || null;
-  //   const nextSiteId = storedId || matchedNew || updatedSites[0]?.id || null;
-
-  //   if (nextSiteId && nextSiteId !== activeSite?.id) {
-  //     selectSite(nextSiteId);
-  //     await loadTokens(nextSiteId);
-  //     await loadDomains(nextSiteId);
-  //   } else {
-  //     await loadTokens(nextSiteId ?? activeSite?.id ?? null);
-  //     await loadDomains(nextSiteId ?? activeSite?.id ?? null);
-  //   }
-
-  //   setNewSiteName("");
-  //   setNewSiteDomain("");
-  //   setNotice("Site created. TXT record generated for your domain—verify it right away.");
-  // }
 
   async function handleDeleteSiteConfirmed() {
     if (!activeSite) return;
@@ -247,8 +214,9 @@ export default function SitesPage() {
       setTokenName("");
       await loadTokens();
       setNotice("Token created. Copy it now — it will not be shown again.");
-    } catch {
-      setError("Unable to create token. Only site owners can manage tokens.");
+    } catch (err: any) {
+      const msg = err?.response?.data?.message || "Unable to create token. Only site owners can manage tokens.";
+      setError(msg);
     }
   }
 
@@ -258,6 +226,7 @@ export default function SitesPage() {
       await api.delete(`/admin/sites/${activeSite.id}/tokens/${id}`);
       await loadTokens();
       setNotice("Token deleted.");
+      setPlainToken("");
     } catch {
       setError("Unable to delete token.");
     }
@@ -374,7 +343,7 @@ export default function SitesPage() {
     [activeSiteDomains]
   );
   const hasToken = useMemo(() => tokens.length > 0, [tokens]);
-  const tokenLimitReached = tokens.length >= 1;
+  const tokenLimitReached = tokens.length >= 1 && !tokenLoading;
   const lastUsedAt = useMemo(() => {
     const t = tokens.find((tok) => tok.lastUsedAt);
     return t?.lastUsedAt ? new Date(t.lastUsedAt) : null;
@@ -794,7 +763,7 @@ export default function SitesPage() {
                           <Button
                             className="w-full rounded-xl bg-cyan-600 hover:bg-cyan-700"
                             onClick={handleCreateToken}
-                            disabled={!tokenName.trim() || !activeSite || tokenLimitReached}
+                            disabled={!tokenName.trim() || !activeSite}
                           >
                             <Plus className="mr-2 h-4 w-4" />
                             {tokenLimitReached ? "Limit reached" : "Create token"}
@@ -803,6 +772,29 @@ export default function SitesPage() {
                           {tokenLimitReached ? (
                             <div className="rounded-2xl border border-amber-200 bg-amber-50 p-3 text-xs text-amber-800">
                               One token per site is allowed. Delete the existing token to issue a new one.
+                            </div>
+                          ) : null}
+
+                          {plainToken ? (
+                            <div className="rounded-2xl border border-green-200 bg-green-50 p-3 text-xs text-green-900">
+                              <div className="font-semibold text-green-800">Plain token (copy now)</div>
+                              <div className="mt-1 break-all rounded-md bg-white px-3 py-2 font-mono text-[11px] text-slate-900 border border-green-200">
+                                {plainToken}
+                              </div>
+                              <div className="mt-2 flex items-center gap-2">
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="rounded-lg"
+                                  onClick={() => copyToClipboard(plainToken, "Plain token copied")}
+                                >
+                                  <Copy className="mr-2 h-3.5 w-3.5" />
+                                  Copy plain token
+                                </Button>
+                                <span className="text-[11px] text-green-800/80">
+                                  Shown only at creation. Store it securely.
+                                </span>
+                              </div>
                             </div>
                           ) : null}
 
@@ -857,20 +849,19 @@ export default function SitesPage() {
                                   </div>
 
                                   <div className="flex flex-wrap items-center gap-2 text-xs">
-                                    <span className="text-slate-600">Token ID:</span>
+                                    <span className="text-slate-600">Plain token:</span>
                                     <code className="rounded-lg bg-slate-100 px-2 py-1 text-slate-800 break-all">
-                                      {t.id}
+                                      {t.plain}
                                     </code>
                                     <Button
                                       variant="outline"
                                       size="sm"
                                       className="rounded-lg"
-                                      onClick={() => copyToClipboard(t.id, "Token ID copied")}
+                                      onClick={() => copyToClipboard(t.plain, "Plain token copied")}
                                     >
                                       <Copy className="mr-2 h-3.5 w-3.5" />
-                                      Copy ID
+                                      Copy token
                                     </Button>
-                                    <span className="text-slate-500">Plain token is only shown at creation.</span>
                                   </div>
                                 </div>
 
@@ -989,7 +980,7 @@ const { posts } = await res.json();`}
               </pre>
               <div className="mt-2 text-xs text-slate-600">
                 Replace <code className="rounded bg-slate-100 px-1.5 py-0.5">&lt;your-site-token&gt;</code>{" "}
-                with a token you created.
+                with the plain token shown at creation (not the Token ID). Keep it secret.
               </div>
             </div>
 
