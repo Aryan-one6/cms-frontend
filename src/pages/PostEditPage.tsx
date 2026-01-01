@@ -1,7 +1,7 @@
 import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { api } from "../lib/api";
-import { uploadCoverImage } from "../lib/upload";
+import { uploadCoverImage, generateCoverImage } from "../lib/upload";
 import BlogPreview from "../components/BlogPreview";
 import RichTextEditor from "../components/RichTextEditor";
 import AdminLayout from "@/components/AdminLayout";
@@ -45,6 +45,7 @@ export default function PostEditPage() {
   const [tagsText, setTagsText] = useState("");
   const [coverImageUrl, setCoverImageUrl] = useState("");
   const [uploading, setUploading] = useState(false);
+  const [generatingImage, setGeneratingImage] = useState(false);
 
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -99,6 +100,29 @@ export default function PostEditPage() {
       setError("Image upload failed");
     } finally {
       setUploading(false);
+    }
+  }
+
+  async function handleGenerateImage(customPrompt?: string) {
+    if (readOnly) {
+      setError("You can only change the cover image on posts you created.");
+      return;
+    }
+    const prompt = (customPrompt || aiTopic || title || excerpt || "blog cover").trim();
+    if (!prompt) {
+      setError("Enter a prompt to generate a cover image.");
+      return;
+    }
+    setGeneratingImage(true);
+    setError("");
+    try {
+      const { relativeUrl } = await generateCoverImage(prompt, id);
+      setCoverImageUrl(relativeUrl);
+    } catch (err: any) {
+      const msg = err?.response?.data?.message || err?.response?.data?.detail || "Failed to generate image";
+      setError(msg);
+    } finally {
+      setGeneratingImage(false);
     }
   }
 
@@ -328,20 +352,47 @@ export default function PostEditPage() {
                   </div>
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-slate-700">Cover image</label>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleFileChange}
-                      className="block w-full text-sm text-slate-600 file:mr-4 file:rounded-md file:border-0 file:bg-slate-900 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-slate-800"
+                    <Input
+                      placeholder="Image prompt (optional, used for AI cover)"
+                      value={aiTopic}
+                      onChange={(e) => setAiTopic(e.target.value)}
                       disabled={readOnly}
                     />
+                    <div className="grid gap-2 md:grid-cols-3">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleFileChange}
+                        className="block w-full text-sm text-slate-600 file:mr-4 file:rounded-md file:border-0 file:bg-slate-900 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-slate-800 disabled:cursor-not-allowed"
+                        disabled={readOnly}
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => handleGenerateImage(aiTopic)}
+                        disabled={generatingImage || readOnly}
+                      >
+                        {generatingImage ? "Generating…" : "AI cover image"}
+                      </Button>
+                      {coverImageUrl && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          onClick={() => !readOnly && setCoverImageUrl("")}
+                          disabled={readOnly}
+                        >
+                          Remove image
+                        </Button>
+                      )}
+                    </div>
                     <div className="flex items-center gap-2 text-xs text-slate-500">
                       <span>PNG, JPG up to 5MB.</span>
                       {uploading && <span className="text-slate-700">Uploading…</span>}
+                      {generatingImage && <span className="text-slate-700">Creating image…</span>}
                     </div>
                     {coverImageUrl && (
-                      <div className="overflow-hidden rounded-lg border border-slate-200">
-                        <img src={coverFullUrl} alt="cover" className="h-36 w-full object-cover" />
+                      <div className="overflow-hidden rounded-lg border border-slate-200 bg-slate-50">
+                        <img src={coverFullUrl} alt="cover" className="h-36 w-full object-contain bg-slate-50" />
                       </div>
                     )}
                   </div>

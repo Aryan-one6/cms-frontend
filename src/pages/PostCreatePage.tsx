@@ -2,7 +2,7 @@ import { useState, type ChangeEvent, type FormEvent } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { api } from "../lib/api";
 import RichTextEditor from "../components/RichTextEditor";
-import { uploadCoverImage } from "../lib/upload";
+import { uploadCoverImage, generateCoverImage } from "../lib/upload";
 import BlogPreview from "../components/BlogPreview";
 import AdminLayout from "@/components/AdminLayout";
 import { Button } from "@/components/ui/button";
@@ -27,6 +27,7 @@ export default function PostCreatePage() {
 
   const [coverImageUrl, setCoverImageUrl] = useState("");
   const [uploading, setUploading] = useState(false);
+  const [generatingImage, setGeneratingImage] = useState(false);
 
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
@@ -88,6 +89,25 @@ export default function PostCreatePage() {
     .filter(Boolean);
 
   const coverFullUrl = buildAssetUrl(coverImageUrl);
+
+  async function handleGenerateImage(customPrompt?: string) {
+    const prompt = (customPrompt || aiTopic || title || excerpt || "blog cover").trim();
+    if (!prompt) {
+      setError("Enter a prompt to generate a cover image.");
+      return;
+    }
+    setGeneratingImage(true);
+    setError("");
+    try {
+      const { relativeUrl } = await generateCoverImage(prompt);
+      setCoverImageUrl(relativeUrl);
+    } catch (err: any) {
+      const msg = err?.response?.data?.message || err?.response?.data?.detail || "Failed to generate image";
+      setError(msg);
+    } finally {
+      setGeneratingImage(false);
+    }
+  }
 
   async function handleGenerate() {
     const topic = (aiTopic || title).trim();
@@ -224,19 +244,40 @@ export default function PostCreatePage() {
                   </div>
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-slate-700">Cover image</label>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleFileChange}
-                      className="block w-full text-sm text-slate-600 file:mr-4 file:rounded-md file:border-0 file:bg-slate-900 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-slate-800"
+                    <Input
+                      placeholder="Image prompt (optional, used for AI cover)"
+                      value={aiTopic}
+                      onChange={(e) => setAiTopic(e.target.value)}
                     />
+                    <div className="grid gap-2 md:grid-cols-3">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleFileChange}
+                        className="block w-full text-sm text-slate-600 file:mr-4 file:rounded-md file:border-0 file:bg-slate-900 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-slate-800"
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => handleGenerateImage(aiTopic)}
+                        disabled={generatingImage}
+                      >
+                        {generatingImage ? "Generating…" : "AI cover image"}
+                      </Button>
+                      {coverImageUrl && (
+                        <Button type="button" variant="ghost" onClick={() => setCoverImageUrl("")}>
+                          Remove image
+                        </Button>
+                      )}
+                    </div>
                     <div className="flex items-center gap-2 text-xs text-slate-500">
                       <span>PNG, JPG up to 5MB.</span>
                       {uploading && <span className="text-slate-700">Uploading…</span>}
+                      {generatingImage && <span className="text-slate-700">Creating image…</span>}
                     </div>
                     {coverImageUrl && (
-                      <div className="overflow-hidden rounded-lg border border-slate-200">
-                        <img src={coverFullUrl} alt="cover" className="h-36 w-full object-cover" />
+                      <div className="overflow-hidden rounded-lg border border-slate-200 bg-slate-50">
+                        <img src={coverFullUrl} alt="cover" className="h-36 w-full object-contain bg-slate-50" />
                       </div>
                     )}
                   </div>
