@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useSite } from "@/lib/site";
 import { api } from "@/lib/api";
+import PageHeader from "@/components/PageHeader";
 import {
   CheckCircle2,
   Globe,
@@ -115,7 +116,7 @@ function StatusBadge({ status }: { status: Domain["status"] }) {
 }
 
 export default function SitesPage() {
-  const { sites, activeSite, selectSite,  deleteSite } = useSite();
+  const { sites, activeSite, selectSite, deleteSite } = useSite();
 
 
   const [tokenName, setTokenName] = useState("");
@@ -375,91 +376,80 @@ export default function SitesPage() {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        {/* TOP BAR */}
-        <div className="overflow-hidden rounded-2xl border border-cyan-200 bg-linear-to-r from-cyan-700 via-cyan-600 to-sky-600 text-white shadow">
-          <div className="px-6 py-5">
-            <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-              <div className="space-y-2">
-                <div className="flex flex-wrap items-center gap-2">
-                  <Badge className="bg-white/20 text-white">Sites</Badge>
-                  {activeSite?.membershipRole ? (
-                    <Badge className="bg-white/15 text-white">{activeSite.membershipRole}</Badge>
-                  ) : null}
-                </div>
-
-                <h1 className="text-2xl font-semibold leading-tight">
-                  {activeSite ? activeSite.name : "Manage your sites"}
-                </h1>
-
-                <p className="max-w-3xl text-sm text-white/90">
-                  Connect your domain, verify ownership, and issue tokens to publish and fetch content.
-                </p>
-
-                <div className="mt-3 grid gap-2 sm:grid-cols-3">
-                  <StatPill
-                    icon={<Globe className="h-4 w-4" />}
-                    label="Domains verified"
-                    value={`${verifiedCount}/${activeSiteDomains.length || 0}`}
-                    tone="cyan"
-                  />
-                  <StatPill
-                    icon={<KeyRound className="h-4 w-4" />}
-                    label="Tokens issued"
-                    value={tokens.length}
-                    tone="default"
-                  />
-                  <StatPill
-                    icon={<ShieldCheck className="h-4 w-4" />}
-                    label="Last token used"
-                    value={lastUsedAt ? lastUsedAt.toLocaleString() : "—"}
-                    tone={lastUsedAt ? "success" : "warn"}
-                  />
-                </div>
+        <PageHeader
+          eyebrow={
+            <>
+              <Badge className="bg-slate-900 text-white">Sites</Badge>
+              {activeSite?.membershipRole ? (
+                <Badge variant="secondary">{activeSite.membershipRole}</Badge>
+              ) : null}
+            </>
+          }
+          title={activeSite ? activeSite.name : "Manage your sites"}
+          description="Connect your domain, verify ownership, and issue tokens to publish and fetch content."
+          actions={
+            <>
+              <select
+                className="w-full min-w-[220px] rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 outline-none ring-0 focus:border-slate-300 sm:w-auto"
+                value={activeSite?.id || ""}
+                onChange={(e) => selectSite(e.target.value)}
+              >
+                <option value="" disabled>
+                  Choose a site
+                </option>
+                {sites.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.name}
+                  </option>
+                ))}
+              </select>
+              <Button
+                variant="outline"
+                className="rounded-xl border-red-200 text-red-700 hover:text-red-800"
+                disabled={!activeSite}
+                onClick={() => setDeleteSiteOpen(true)}
+              >
+                <Trash2 className="mr-2 h-4 w-4" />
+                Delete site
+              </Button>
+            </>
+          }
+          meta={
+            <div className="w-full space-y-2">
+              <div className="grid gap-2 sm:grid-cols-3">
+                <StatPill
+                  icon={<Globe className="h-4 w-4" />}
+                  label="Domains verified"
+                  value={`${verifiedCount}/${activeSiteDomains.length || 0}`}
+                  tone="cyan"
+                />
+                <StatPill
+                  icon={<KeyRound className="h-4 w-4" />}
+                  label="Tokens issued"
+                  value={tokens.length}
+                  tone="default"
+                />
+                <StatPill
+                  icon={<ShieldCheck className="h-4 w-4" />}
+                  label="Last token used"
+                  value={lastUsedAt ? lastUsedAt.toLocaleString() : "—"}
+                  tone={lastUsedAt ? "success" : "warn"}
+                />
               </div>
-
-              <div className="flex flex-col gap-2 lg:items-end">
-                <div className="flex flex-wrap gap-2">
-                  <select
-                    className="min-w-55 rounded-xl border border-white/30 bg-white/10 px-3 py-2 text-sm text-white outline-none ring-0 focus:border-white/50"
-                    value={activeSite?.id || ""}
-                    onChange={(e) => selectSite(e.target.value)}
-                  >
-                    <option value="" disabled>
-                      Choose a site
-                    </option>
-                    {sites.map((s) => (
-                      <option key={s.id} value={s.id} className="text-slate-900">
-                        {s.name}
-                      </option>
-                    ))}
-                  </select>
-
-                  <Button
-                    variant="outline"
-                    className="rounded-xl border-red-200 text-red-700 hover:text-red-800"
-                    disabled={!activeSite}
-                    onClick={() => setDeleteSiteOpen(true)}
-                  >
-                    <Trash2 className="mr-2 h-4 w-4" />
-                    Delete site
-                  </Button>
-                </div>
-
-                <div className="text-xs text-white/80">
-                  {activeSite ? (
-                    <>
-                      <span>Slug: {activeSite.slug ?? "—"}</span>
-                      <span className="mx-2">•</span>
-                      <span>Site ID: {activeSite.id}</span>
-                    </>
-                  ) : (
-                    "Select or create a site to continue"
-                  )}
-                </div>
+              <div className="text-xs text-slate-500">
+                {activeSite ? (
+                  <>
+                    <span>Slug: {activeSite.slug ?? "—"}</span>
+                    <span className="mx-2">|</span>
+                    <span>Site ID: {activeSite.id}</span>
+                  </>
+                ) : (
+                  "Select or create a site to continue"
+                )}
               </div>
             </div>
-          </div>
-        </div>
+          }
+        />
 
         {/* ALERTS */}
         {(error || notice) && (
@@ -574,21 +564,21 @@ export default function SitesPage() {
                       <div className="grid gap-3 md:grid-cols-1">
                         <div className="rounded-xl bg-white p-3 border border-cyan-200/70">
                           <div className="text-xs font-semibold text-slate-700">DNS TXT record</div>
-                          <div className="mt-2 flex items-start gap-2">
-                            <code className="flex-1 rounded-lg bg-slate-50 p-2 text-xs text-slate-800 break-all border border-slate-100">
-                              {primaryDomain ? txtRecord : "Add a domain to generate a TXT token."}
-                            </code>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="rounded-lg"
-                              disabled={!primaryDomain}
-                              onClick={() => primaryDomain && copyToClipboard(txtRecord, "TXT record copied")}
-                            >
-                              <Copy className="mr-2 h-3.5 w-3.5" />
-                              Copy
-                            </Button>
-                          </div>
+                      <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-start">
+                        <code className="flex-1 rounded-lg bg-slate-50 p-2 text-xs text-slate-800 break-all border border-slate-100">
+                          {primaryDomain ? txtRecord : "Add a domain to generate a TXT token."}
+                        </code>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="w-full rounded-lg sm:w-auto"
+                          disabled={!primaryDomain}
+                          onClick={() => primaryDomain && copyToClipboard(txtRecord, "TXT record copied")}
+                        >
+                          <Copy className="mr-2 h-3.5 w-3.5" />
+                          Copy
+                        </Button>
+                      </div>
                           <div className="mt-2 text-[12px] text-slate-600">
                             Add this TXT record at your DNS provider for the domain.
                           </div>
@@ -665,7 +655,7 @@ export default function SitesPage() {
                                   <Button
                                     size="sm"
                                     variant="outline"
-                                    className="rounded-xl"
+                                    className="w-full rounded-xl sm:w-auto"
                                     disabled={dnsBusy}
                                     onClick={() => verifyDomain(d.id)}
                                   >
@@ -674,7 +664,7 @@ export default function SitesPage() {
 
                                   <Button
                                     size="sm"
-                                    className="rounded-xl bg-cyan-600 hover:bg-cyan-700"
+                                    className="w-full rounded-xl bg-cyan-600 hover:bg-cyan-700 sm:w-auto"
                                     disabled={htmlBusy}
                                     onClick={() => verifyDomainHtml(d.id)}
                                   >
@@ -684,7 +674,7 @@ export default function SitesPage() {
                                   <Button
                                     size="sm"
                                     variant="destructive"
-                                    className="rounded-xl"
+                                    className="w-full rounded-xl sm:w-auto"
                                     disabled={!isOwner}
                                     onClick={() => setDeleteDomainTarget(d)}
                                     title={!isOwner ? "Only owners can delete domains" : undefined}
@@ -726,7 +716,7 @@ export default function SitesPage() {
                         <Separator className="my-4 bg-cyan-200/70" />
 
                         <div className="space-y-3">
-                          <div className="space-y-1 md:grid md:grid-cols-2 space-x-3.5">
+                          <div className="grid gap-3 md:grid-cols-2">
                             <div>
                               <label className="text-xs font-medium text-slate-700" htmlFor="token-name">
                                 Token name
@@ -868,7 +858,7 @@ export default function SitesPage() {
                                 <Button
                                   variant="outline"
                                   size="sm"
-                                  className="rounded-xl"
+                                  className="w-full rounded-xl sm:w-auto"
                                   onClick={() => deleteToken(t.id)}
                                 >
                                   <Trash2 className="mr-2 h-4 w-4" />

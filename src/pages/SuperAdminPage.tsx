@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import PageHeader from "@/components/PageHeader";
 // import { Separator } from "@/components/ui/separator";
 import { AlertTriangle, Trash2, ShieldCheck, UserCheck, PauseCircle } from "lucide-react";
 
@@ -170,20 +171,20 @@ export default function SuperAdminPage() {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <div className="text-xs uppercase text-slate-500">Super Admin</div>
-            <h1 className="text-2xl font-semibold text-slate-900">Control center</h1>
-            <p className="text-sm text-slate-600">Manage users, sites, and posts with full access.</p>
-          </div>
-          <div className="flex items-center gap-2 text-xs">
-            <Badge className="bg-cyan-600 text-white">
-              <ShieldCheck className="mr-1 h-4 w-4" />
-              Active users: {activeUsers}
-            </Badge>
-            <Badge variant="secondary">Active sites: {activeSites}</Badge>
-          </div>
-        </div>
+        <PageHeader
+          eyebrow="Super Admin"
+          title="Control center"
+          description="Manage users, sites, and posts with full access."
+          meta={
+            <>
+              <Badge className="bg-cyan-600 text-white">
+                <ShieldCheck className="mr-1 h-4 w-4" />
+                Active users: {activeUsers}
+              </Badge>
+              <Badge variant="secondary">Active sites: {activeSites}</Badge>
+            </>
+          }
+        />
 
         {error && (
           <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">{error}</div>

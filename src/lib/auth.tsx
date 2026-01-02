@@ -6,6 +6,14 @@ type Admin = {
   name: string;
   email: string;
   role: string;
+  createdAt?: string;
+  avatarUrl?: string | null;
+  accountSubscription?: {
+    plan: string;
+    status: string;
+    expiresAt?: string | null;
+    startedAt?: string | null;
+  } | null;
 };
 
 type AuthContextType = {
@@ -15,6 +23,7 @@ type AuthContextType = {
   signup: (name: string, email: string, password: string, siteName: string, domain: string) => Promise<void>;
   requestPasswordReset: (email: string) => Promise<void>;
   resetPassword: (token: string, password: string) => Promise<void>;
+  refresh: () => Promise<void>;
   logout: () => Promise<void>;
 };
 
@@ -64,7 +73,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <AuthContext.Provider
-      value={{ admin, loading, login, signup, requestPasswordReset, resetPassword, logout }}
+      value={{ admin, loading, login, signup, requestPasswordReset, resetPassword, refresh: fetchMe, logout }}
     >
       {children}
     </AuthContext.Provider>

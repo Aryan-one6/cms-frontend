@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
+import PageHeader from "@/components/PageHeader";
 import { useSite } from "@/lib/site";
 import { api } from "@/lib/api";
 import { Copy } from "lucide-react";
@@ -45,7 +46,8 @@ export default function NewSitePage() {
       navigate("/sites");
     } catch (err) {
       console.error(err);
-      setError("Unable to create site. Only authorized admins can create sites.");
+      const msg = (err as any)?.response?.data?.message;
+      setError(msg || "Unable to create site. Only authorized admins can create sites.");
     } finally {
       setLoading(false);
     }
@@ -59,9 +61,12 @@ export default function NewSitePage() {
 
   return (
     <AdminLayout>
-      <div className="mb-6 flex items-center gap-3">
-        <Badge className="bg-cyan-600 text-white">New</Badge>
-        <h1 className="text-2xl font-semibold text-slate-900">Create a site</h1>
+      <div className="mb-6">
+        <PageHeader
+          eyebrow={<Badge className="bg-cyan-600 text-white">New</Badge>}
+          title="Create a site"
+          description="Add your primary domain now so verification can begin immediately."
+        />
       </div>
 
       {(error || notice) && (

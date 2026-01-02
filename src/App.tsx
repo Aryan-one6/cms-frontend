@@ -13,6 +13,8 @@ import SitesPage from "./pages/SitesPage";
 import NewSitePage from "./pages/NewSitePage";
 import SuperAdminPage from "./pages/SuperAdminPage";
 import PostViewPage from "./pages/PostViewPage";
+import PricingPage from "./pages/PricingPage";
+import AccountPage from "./pages/AccountPage";
 
 import { SiteProvider } from "./lib/site";
 
@@ -66,6 +68,22 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <PostViewPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/pricing"
+            element={
+              <ProtectedRoute>
+                <PricingPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/account"
+            element={
+              <ProtectedRoute>
+                <AccountPage />
               </ProtectedRoute>
             }
           />

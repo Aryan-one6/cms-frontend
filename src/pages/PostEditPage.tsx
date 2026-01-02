@@ -5,6 +5,7 @@ import { uploadCoverImage, generateCoverImage } from "../lib/upload";
 import BlogPreview from "../components/BlogPreview";
 import RichTextEditor from "../components/RichTextEditor";
 import AdminLayout from "@/components/AdminLayout";
+import PageHeader from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -245,43 +246,46 @@ export default function PostEditPage() {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div className="space-y-2">
-            <p className="text-sm uppercase tracking-wide text-slate-400">Edit</p>
-            <div className="flex items-center gap-3">
-              <h1 className="text-2xl font-semibold text-slate-900">Edit post</h1>
+        <PageHeader
+          eyebrow="Edit"
+          title="Edit post"
+          description="Update content, change the cover, and publish or unpublish instantly."
+          actions={
+            <>
+              <Button variant="outline" asChild>
+                <Link to="/posts">Back to posts</Link>
+              </Button>
+              {!readOnly ? (
+                <>
+                  {post.status === "DRAFT" ? (
+                    <Button type="button" variant="secondary" onClick={publish}>
+                      Publish
+                    </Button>
+                  ) : (
+                    <Button type="button" variant="secondary" onClick={unpublish}>
+                      Unpublish
+                    </Button>
+                  )}
+                  <Button type="button" variant="destructive" onClick={deletePost}>
+                    Delete
+                  </Button>
+                  <Button type="submit" form="edit-form" disabled={saving || readOnly}>
+                    {saving ? "Saving..." : "Save changes"}
+                  </Button>
+                </>
+              ) : null}
+            </>
+          }
+          meta={
+            <>
               <Badge variant={statusVariant}>{post.status}</Badge>
-            </div>
-            <p className="text-sm text-slate-500">Update content, change the cover, and publish or unpublish instantly.</p>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-2">
-            <Button variant="outline" asChild>
-              <Link to="/posts">Back to posts</Link>
-            </Button>
-            {!readOnly ? (
-              <>
-                {post.status === "DRAFT" ? (
-                  <Button type="button" variant="secondary" onClick={publish}>
-                    Publish
-                  </Button>
-                ) : (
-                  <Button type="button" variant="secondary" onClick={unpublish}>
-                    Unpublish
-                  </Button>
-                )}
-                <Button type="button" variant="destructive" onClick={deletePost}>
-                  Delete
-                </Button>
-                <Button type="submit" form="edit-form" disabled={saving || readOnly}>
-                  {saving ? "Saving..." : "Save changes"}
-                </Button>
-              </>
-            ) : (
-              <Badge variant="secondary">View only</Badge>
-            )}
-          </div>
-        </div>
+              {readOnly ? <Badge variant="secondary">View only</Badge> : null}
+              <span className="rounded-full bg-white/80 px-3 py-1">
+                Updated: {new Date(post.updatedAt).toLocaleString()}
+              </span>
+            </>
+          }
+        />
 
         {readOnly && (
           <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
@@ -358,12 +362,12 @@ export default function PostEditPage() {
                       onChange={(e) => setAiTopic(e.target.value)}
                       disabled={readOnly}
                     />
-                    <div className="grid gap-2 md:grid-cols-3">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
                       <input
                         type="file"
                         accept="image/*"
                         onChange={handleFileChange}
-                        className="block w-full text-sm text-slate-600 file:mr-4 file:rounded-md file:border-0 file:bg-slate-900 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-slate-800 disabled:cursor-not-allowed"
+                        className="block w-full text-sm text-slate-600 file:mr-4 file:rounded-md file:border-0 file:bg-slate-900 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-slate-800 disabled:cursor-not-allowed sm:flex-1"
                         disabled={readOnly}
                       />
                       <Button
@@ -371,6 +375,7 @@ export default function PostEditPage() {
                         variant="outline"
                         onClick={() => handleGenerateImage(aiTopic)}
                         disabled={generatingImage || readOnly}
+                        className="w-full sm:w-auto"
                       >
                         {generatingImage ? "Generating…" : "AI cover image"}
                       </Button>
@@ -380,6 +385,7 @@ export default function PostEditPage() {
                           variant="ghost"
                           onClick={() => !readOnly && setCoverImageUrl("")}
                           disabled={readOnly}
+                          className="w-full sm:w-auto"
                         >
                           Remove image
                         </Button>
@@ -404,10 +410,10 @@ export default function PostEditPage() {
                 </div>
 
                 <div className="flex flex-wrap justify-end gap-2">
-                  <Button variant="outline" asChild>
+                  <Button variant="outline" asChild className="w-full sm:w-auto">
                     <Link to="/posts">Cancel</Link>
                   </Button>
-                  <Button type="submit" disabled={saving || readOnly}>
+                  <Button type="submit" disabled={saving || readOnly} className="w-full sm:w-auto">
                     {saving ? "Saving..." : "Save changes"}
                   </Button>
                 </div>

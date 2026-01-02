@@ -4,6 +4,8 @@ import { useAuth } from "../lib/auth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { buildOAuthUrl } from "@/lib/oauth";
+import { Github } from "lucide-react";
 
 export default function SignupPage() {
   const { signup } = useAuth();
@@ -17,6 +19,8 @@ export default function SignupPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const googleUrl = buildOAuthUrl("google", "/sites");
+  const githubUrl = buildOAuthUrl("github", "/sites");
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -57,6 +61,28 @@ export default function SignupPage() {
 
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-3">
+            <Button asChild variant="outline" className="w-full gap-2">
+              <a href={googleUrl}>
+                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-slate-100 text-xs font-semibold text-slate-600">
+                  G
+                </span>
+                Sign up with Google
+              </a>
+            </Button>
+
+            <Button asChild variant="outline" className="w-full gap-2">
+              <a href={githubUrl}>
+                <Github className="h-4 w-4" />
+                Sign up with GitHub
+              </a>
+            </Button>
+
+            <div className="flex items-center gap-2 text-xs text-slate-400">
+              <span className="h-px flex-1 bg-slate-200" />
+              or use email
+              <span className="h-px flex-1 bg-slate-200" />
+            </div>
+
             <Input placeholder="Full name" value={name} onChange={(e) => setName(e.target.value)} required />
             <Input placeholder="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
             <Input

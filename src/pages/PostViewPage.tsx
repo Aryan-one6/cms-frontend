@@ -6,6 +6,7 @@ import { buildAssetUrl } from "@/lib/media";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import PageHeader from "@/components/PageHeader";
 
 type Post = {
   id: string;
@@ -44,35 +45,36 @@ export default function PostViewPage() {
   return (
     <AdminLayout>
       <div className="space-y-4">
-        <div className="flex items-center justify-between gap-3">
-          <div>
-            <div className="text-xs uppercase text-slate-500">Post viewer</div>
-            <h1 className="text-2xl font-semibold text-slate-900">
-              {loading ? "Loading…" : post?.title || "Untitled post"}
-            </h1>
-            {post && (
-              <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-slate-600">
-                <Badge variant={post.status === "PUBLISHED" ? "default" : "secondary"}>{post.status}</Badge>
-                <span>Updated {new Date(post.updatedAt).toLocaleString()}</span>
-                {post.author?.name ? <span>• Author: {post.author.name}</span> : null}
-              </div>
-            )}
-          </div>
-          <div className="flex gap-2">
-            {id ? (
-              <Link to={`/posts/${id}/edit`}>
-                <Button variant="outline" size="sm">
-                  Edit post
+        <PageHeader
+          eyebrow="Post viewer"
+          title={loading ? "Loading..." : post?.title || "Untitled post"}
+          description="Preview the published content as your readers will see it."
+          actions={
+            <>
+              {id ? (
+                <Button asChild variant="outline">
+                  <Link to={`/posts/${id}/edit`}>Edit post</Link>
                 </Button>
-              </Link>
-            ) : null}
-            <Link to="/posts">
-              <Button size="sm" variant="secondary">
-                Back to posts
+              ) : null}
+              <Button asChild variant="secondary">
+                <Link to="/posts">Back to posts</Link>
               </Button>
-            </Link>
-          </div>
-        </div>
+            </>
+          }
+          meta={
+            post ? (
+              <>
+                <Badge variant={post.status === "PUBLISHED" ? "default" : "secondary"}>{post.status}</Badge>
+                <span className="rounded-full bg-white/80 px-3 py-1">
+                  Updated: {new Date(post.updatedAt).toLocaleString()}
+                </span>
+                {post.author?.name ? (
+                  <span className="rounded-full bg-white/80 px-3 py-1">Author: {post.author.name}</span>
+                ) : null}
+              </>
+            ) : null
+          }
+        />
 
         {error && (
           <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>

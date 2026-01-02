@@ -1,66 +1,188 @@
+import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
+import type { LucideIcon } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import { useAuth } from "../lib/auth";
 import { useSite } from "@/lib/site";
-import { Badge } from "@/components/ui/badge";
+import {
+  LayoutGrid,
+  PenLine,
+  Globe,
+  CreditCard,
+  ShieldCheck,
+  Sparkles,
+  LogOut,
+  PlusCircle,
+  UserCircle2,
+  ChevronsLeft,
+  ChevronsRight,
+  Menu,
+  X,
+} from "lucide-react";
 
-function NavItem({ to, label }: { to: string; label: string }) {
+type NavItem = {
+  to: string;
+  label: string;
+  icon: LucideIcon;
+};
+
+function buildNav(adminRole?: string): NavItem[] {
+  const items: NavItem[] = [
+    { to: "/", label: "Dashboard", icon: LayoutGrid },
+    { to: "/posts", label: "Posts", icon: PenLine },
+    { to: "/sites", label: "Sites", icon: Globe },
+    { to: "/pricing", label: "Pricing", icon: CreditCard },
+    { to: "/account", label: "Account", icon: UserCircle2 },
+  ];
+  if (adminRole === "SUPER_ADMIN") {
+    items.push({ to: "/super-admin", label: "Super Admin", icon: ShieldCheck });
+  }
+  return items;
+}
+
+function NavLink({
+  item,
+  variant = "sidebar",
+  expanded = true,
+  onNavigate,
+}: {
+  item: NavItem;
+  variant?: "sidebar" | "top";
+  expanded?: boolean;
+  onNavigate?: () => void;
+}) {
   const { pathname } = useLocation();
-  const active =
-    to === "/"
-      ? pathname === "/"
-      : pathname === to || pathname.startsWith(`${to}/`);
+  const active = item.to === "/" ? pathname === "/" : pathname === item.to || pathname.startsWith(`${item.to}/`);
+  const Icon = item.icon;
+
+  const base =
+    variant === "sidebar"
+      ? "group flex w-full items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-medium transition"
+      : "group flex items-center gap-2 rounded-full px-3 py-2 text-xs font-medium transition";
+
+  const activeStyle =
+    variant === "sidebar"
+      ? "bg-slate-900 text-white shadow-sm"
+      : "bg-slate-900 text-white";
+  const idleStyle =
+    variant === "sidebar"
+      ? "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+      : "text-slate-600 hover:bg-slate-100 hover:text-slate-900";
 
   return (
     <Link
-      to={to}
-      className={`rounded-lg px-3 py-2 text-sm font-medium transition ${
-        active ? "bg-cyan-600 text-white shadow-sm" : "text-slate-700 hover:bg-slate-100"
-      }`}
+      to={item.to}
+      className={`${base} ${active ? activeStyle : idleStyle}`}
+      title={item.label}
+      aria-label={item.label}
+      onClick={() => {
+        if (variant === "sidebar") onNavigate?.();
+      }}
     >
-      {label}
+      <span
+        className={`flex h-10 w-10 items-center justify-center rounded-2xl ${active ? "bg-white/15" : "bg-slate-100"}`}
+      >
+        <Icon className={`h-4 w-4 ${active ? "text-white" : "text-slate-500"}`} />
+      </span>
+      <span
+        className={`whitespace-nowrap transition-all duration-200 ${
+          expanded || variant === "top" ? "opacity-100" : "pointer-events-none w-0 opacity-0"
+        }`}
+      >
+        {item.label}
+      </span>
     </Link>
   );
 }
 
-function HeaderBar() {
+function Sidebar({ expanded, onToggle, onNavigate }: { expanded: boolean; onToggle: () => void; onNavigate: () => void }) {
+  const { admin } = useAuth();
+  const navItems = buildNav(admin?.role);
+
+  return (
+    <aside
+      className={`hidden min-h-screen flex-col border-r border-slate-200/70 bg-[radial-gradient(100%_80%_at_0%_0%,rgba(14,116,144,0.18),transparent_70%),linear-gradient(180deg,#f8fafc,#ffffff)] transition-all duration-300 lg:flex ${
+        expanded ? "w-72" : "w-20"
+      }`}
+    >
+      <div className={`px-4 pb-4 pt-6 ${expanded ? "flex items-center justify-between" : "flex justify-center"}`}>
+        <div className="flex items-center gap-3">
+          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-900 text-lg font-semibold text-white shadow-sm">
+            SC
+          </div>
+          {expanded ? (
+            <div>
+              <div className="text-xs font-semibold uppercase tracking-[0.25em] text-slate-400">AI-Powered</div>
+              <div className="font-display text-lg font-semibold text-slate-900">CMS Portal</div>
+            </div>
+          ) : null}
+        </div>
+        {expanded ? (
+          <Button variant="ghost" size="icon" className="rounded-full" onClick={onToggle}>
+            <ChevronsLeft className="h-4 w-4 text-slate-500" />
+          </Button>
+        ) : null}
+      </div>
+
+      {!expanded ? (
+        <div className="flex items-center justify-center pb-4">
+          <Button variant="ghost" size="icon" className="rounded-full" onClick={onToggle}>
+            <ChevronsRight className="h-4 w-4 text-slate-500" />
+          </Button>
+        </div>
+      ) : (
+        <div className="px-4">
+          <Badge variant="secondary" className="w-full justify-center gap-1 rounded-full bg-cyan-50 text-cyan-700">
+            <Sparkles className="h-3 w-3" /> AI copilot enabled
+          </Badge>
+        </div>
+      )}
+
+      <nav className={`mt-6 flex flex-1 flex-col gap-2 ${expanded ? "px-4" : "px-2"}`}>
+        {navItems.map((item) => (
+          <NavLink key={item.to} item={item} expanded={expanded} onNavigate={onNavigate} />
+        ))}
+      </nav>
+
+      {expanded ? (
+        <div className="px-4 pb-6">
+          <div className="rounded-2xl border border-slate-200/70 bg-white/80 p-4 shadow-sm">
+            <div className="text-xs uppercase tracking-[0.24em] text-slate-400">AI workspace</div>
+            <div className="mt-2 flex items-center justify-between text-sm font-semibold text-slate-900">
+              Model runtime
+              <Badge className="bg-emerald-100 text-emerald-700">Live</Badge>
+            </div>
+            <p className="mt-2 text-xs text-slate-500">Drafts, cover art, and SEO prompts are ready.</p>
+          </div>
+        </div>
+      ) : null}
+    </aside>
+  );
+}
+
+function TopBar({ onOpenMenu }: { onOpenMenu: () => void }) {
   const { admin, logout } = useAuth();
   const { activeSite, sites, selectSite } = useSite();
 
   return (
-    <header className="border-b border-slate-100 bg-white/90 backdrop-blur">
-      <div className="mx-auto flex flex-wrap items-center justify-between gap-3 px-4 py-3">
+    <header className="sticky top-0 z-30 border-b border-slate-200/70 bg-white/80 backdrop-blur">
+      <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-3">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-900 text-lg font-semibold text-white">
-            SC
+          <div className="hidden sm-block flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700">
+            <span className="h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.6)]" />
+            Active sites
           </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <div className="text-base font-semibold text-slate-900">Sapphire CMS</div>
-              <Badge variant="secondary" className="hidden md:inline-flex">
-                Portal
-              </Badge>
-            </div>
-            <div className="text-xs text-slate-500">
-              {activeSite ? `Active: ${activeSite.name}` : "Choose a site"}
-            </div>
-          </div>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-3">
-          <div className="flex items-center gap-2  px-3 py-1.5">
-            <label className="text-xs font-medium text-slate-500" htmlFor="site-selector">
-              Active Site
-            </label>
+          <div className="hidden items-center gap-2 md:flex">
+           
             <select
               id="site-selector"
-              className="rounded-full border border-slate-200  bg-white px-2 py-1 text-sm text-slate-800 focus:outline-none"
+              className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-700 focus:outline-none"
               value={activeSite?.id || ""}
               onChange={(e) => selectSite(e.target.value)}
             >
               <option value="" disabled>
-                Select…
+                Select a site
               </option>
               {sites.map((s) => (
                 <option key={s.id} value={s.id}>
@@ -68,41 +190,222 @@ function HeaderBar() {
                 </option>
               ))}
             </select>
-           
           </div>
-          <nav className="hidden items-center gap-2 md:flex">
-            <NavItem to="/" label="Dashboard" />
-            <NavItem to="/posts" label="Posts" />
-            <NavItem to="/sites" label="Sites" />
-            {admin?.role === "SUPER_ADMIN" ? <NavItem to="/super-admin" label="Super Admin" /> : null}
-            
-          </nav>
-          <Separator orientation="vertical" className="hidden h-6 md:block" />
-          <div className="flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-900 text-white">
-              {admin?.name?.[0]?.toUpperCase() ?? "A"}
-            </div>
-            <div className="hidden text-sm leading-tight text-slate-700 sm:block">
-              <div className="font-medium">{admin?.name ?? "Admin User"}</div>
-              <div className="text-xs text-slate-500">{admin?.role ?? "Administrator"}</div>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-3">
+          <Button
+            variant="outline"
+            size="icon"
+            className="lg:hidden"
+            onClick={onOpenMenu}
+            aria-label="Open menu"
+          >
+            <Menu className="h-4 w-4" />
+          </Button>
+          <Button asChild size="sm" className="bg-slate-900 text-white hover:bg-slate-800">
+            <Link to="/posts/new" className="flex items-center gap-2">
+              <PlusCircle className="h-4 w-4" />
+              New post
+            </Link>
+          </Button>
+          <div className="flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5">
+            {admin?.avatarUrl ? (
+              <img
+                src={admin.avatarUrl}
+                alt={admin?.name ?? "Admin"}
+                className="h-8 w-8 rounded-full object-cover"
+              />
+            ) : (
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-900 text-white">
+                {admin?.name?.[0]?.toUpperCase() ?? "A"}
+              </div>
+            )}
+            <div className="hidden text-xs leading-tight text-slate-600 sm:block">
+              <div className="font-medium text-slate-900">{admin?.name ?? "Admin User"}</div>
+              <div className="text-[11px] text-slate-400">{admin?.role ?? "Administrator"}</div>
             </div>
           </div>
-          <Button variant="outline" size="sm" onClick={logout}>
+          <Button variant="outline" size="sm" onClick={logout} className="gap-2">
+            <LogOut className="h-4 w-4" />
             Logout
           </Button>
+        </div>
+      </div>
+
+      <div className="flex items-center justify-between px-4 pb-3 md:hidden">
+        <div className="flex flex-1 items-center gap-2">
+          <label className="text-xs font-medium text-slate-500" htmlFor="site-selector-mobile">
+            Site
+          </label>
+          <select
+            id="site-selector-mobile"
+            className="flex-1 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-700 focus:outline-none"
+            value={activeSite?.id || ""}
+            onChange={(e) => selectSite(e.target.value)}
+          >
+            <option value="" disabled>
+              Select a site
+            </option>
+            {sites.map((s) => (
+              <option key={s.id} value={s.id}>
+                {s.name}
+              </option>
+            ))}
+          </select>
         </div>
       </div>
     </header>
   );
 }
 
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
+function MobileMenu({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const { admin, logout } = useAuth();
+  const { activeSite, sites, selectSite } = useSite();
+  const navItems = buildNav(admin?.role);
+
   return (
-    <div className="min-h-screen bg-slate-50">
-      <HeaderBar />
-      <div className="mx-auto  px-4 py-8">
-        <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">{children}</div>
+    <div className={`fixed inset-0 z-40 ${open ? "" : "pointer-events-none"}`}>
+      <div
+        className={`absolute inset-0 bg-slate-900/40 backdrop-blur transition-opacity ${open ? "opacity-100" : "opacity-0"}`}
+        onClick={onClose}
+      />
+      <aside
+        className={`absolute right-0 top-0 flex h-full w-80 max-w-[90vw] flex-col bg-white shadow-2xl transition-transform ${
+          open ? "translate-x-0" : "translate-x-full"
+        }`}
+      >
+        <div className="flex items-center justify-between border-b border-slate-100 px-4 py-4">
+          <div className="text-sm font-semibold text-slate-900">Navigation</div>
+          <Button variant="ghost" size="icon" onClick={onClose} aria-label="Close menu">
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
+
+        <div className="flex flex-1 flex-col gap-4 overflow-y-auto px-4 py-4">
+          <div className="flex items-center gap-3 rounded-2xl border border-slate-100 bg-slate-50 px-3 py-3">
+            {admin?.avatarUrl ? (
+              <img
+                src={admin.avatarUrl}
+                alt={admin?.name ?? "Admin"}
+                className="h-10 w-10 rounded-full object-cover"
+              />
+            ) : (
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-900 text-sm font-semibold text-white">
+                {admin?.name?.[0]?.toUpperCase() ?? "A"}
+              </div>
+            )}
+            <div className="min-w-0">
+              <div className="truncate text-sm font-semibold text-slate-900">{admin?.name ?? "Admin User"}</div>
+              <div className="text-xs text-slate-500">{admin?.role ?? "Administrator"}</div>
+            </div>
+          </div>
+
+          <div className="rounded-2xl border border-slate-100 bg-white px-3 py-3">
+            <label className="text-xs font-medium text-slate-500" htmlFor="site-selector-drawer">
+              Active site
+            </label>
+            <select
+              id="site-selector-drawer"
+              className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700"
+              value={activeSite?.id || ""}
+              onChange={(e) => selectSite(e.target.value)}
+            >
+              <option value="" disabled>
+                Select a site
+              </option>
+              {sites.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <Button asChild className="w-full bg-slate-900 text-white hover:bg-slate-800">
+            <Link to="/posts/new" onClick={onClose}>
+              <PlusCircle className="mr-2 h-4 w-4" />
+              New post
+            </Link>
+          </Button>
+
+          <nav className="grid gap-2">
+            {navItems.map((item) => (
+              <NavLink key={item.to} item={item} expanded onNavigate={onClose} />
+            ))}
+          </nav>
+        </div>
+
+        <div className="border-t border-slate-100 px-4 py-4">
+          <Button
+            variant="outline"
+            className="w-full gap-2"
+            onClick={() => {
+              logout();
+              onClose();
+            }}
+          >
+            <LogOut className="h-4 w-4" />
+            Logout
+          </Button>
+        </div>
+      </aside>
+    </div>
+  );
+}
+
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
+  const storageKey = "sapphire.sidebarExpanded";
+  const [sidebarExpanded, setSidebarExpanded] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    return localStorage.getItem(storageKey) === "true";
+  });
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  const updateSidebar = (value: boolean) => {
+    setSidebarExpanded(value);
+    if (typeof window !== "undefined") {
+      localStorage.setItem(storageKey, value ? "true" : "false");
+    }
+  };
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    localStorage.setItem(storageKey, sidebarExpanded ? "true" : "false");
+  }, [sidebarExpanded]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    document.body.style.overflow = mobileOpen ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [mobileOpen]);
+
+  return (
+    <div className="min-h-screen bg-[radial-gradient(120%_80%_at_50%_0%,rgba(14,165,164,0.08),transparent_65%),linear-gradient(180deg,#f8fafc,#eef2f7)]">
+      <div className="flex min-h-screen">
+        <Sidebar
+          expanded={sidebarExpanded}
+          onToggle={() => updateSidebar(!sidebarExpanded)}
+          onNavigate={() => updateSidebar(true)}
+        />
+        <div className="flex min-h-screen flex-1 flex-col">
+          <TopBar onOpenMenu={() => setMobileOpen(true)} />
+          <main className="relative flex-1">
+            <div className="pointer-events-none absolute inset-0">
+              <div className="absolute right-12 top-16 h-32 w-32 rounded-full bg-cyan-100/70 blur-3xl" />
+              <div className="absolute left-16 top-40 h-40 w-40 rounded-full bg-sky-100/60 blur-3xl" />
+            </div>
+            <div className="relative mx-auto w-full max-w-7xl px-4 py-6 lg:px-8">
+              <div className="rounded-3xl border border-slate-200/70 bg-white/85 p-4 shadow-[0_20px_60px_-40px_rgba(15,23,42,0.45)] sm:p-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
+                {children}
+              </div>
+            </div>
+          </main>
+        </div>
       </div>
+      <MobileMenu open={mobileOpen} onClose={() => setMobileOpen(false)} />
     </div>
   );
 }

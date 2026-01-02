@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import AdminLayout from "../components/AdminLayout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import PageHeader from "@/components/PageHeader";
 import {
   Table,
   TableBody,
@@ -228,40 +229,40 @@ export default function PostsPage() {
 
   return (
     <AdminLayout>
-      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-        <div>
-          <h2 className="text-xl font-semibold">Blog Posts</h2>
-          <p className="text-sm text-slate-500">
-            See which posts are yours and which were created by teammates for {activeSite?.name ?? "this site"}.
-          </p>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-2">
-          <input
-            id={fileInputId}
-            type="file"
-            accept="application/json,text/csv"
-            className="hidden"
-            onChange={(e) => handleImport(e.target.files?.[0])}
-          />
-          <Button variant="outline" onClick={handleExport} disabled={exporting}>
-            {exporting ? "Exporting..." : "Export posts"}
-          </Button>
-          <Button variant="outline" onClick={handleExportCsv} disabled={exportingCsv}>
-            {exportingCsv ? "Exporting CSV..." : "Export CSV"}
-          </Button>
-          <Button
-            variant="secondary"
-            onClick={() => document.getElementById(fileInputId)?.click()}
-            disabled={importing}
-          >
-            {importing ? "Importing..." : "Import posts"}
-          </Button>
-          <Link to="/posts/new">
-            <Button>Create Post</Button>
-          </Link>
-        </div>
-      </div>
+      <PageHeader
+        eyebrow="Posts"
+        title="Blog Posts"
+        description={`See which posts are yours and which were created by teammates for ${
+          activeSite?.name ?? "this site"
+        }.`}
+        actions={
+          <>
+            <input
+              id={fileInputId}
+              type="file"
+              accept="application/json,text/csv"
+              className="hidden"
+              onChange={(e) => handleImport(e.target.files?.[0])}
+            />
+            <Button variant="outline" onClick={handleExport} disabled={exporting}>
+              {exporting ? "Exporting..." : "Export posts"}
+            </Button>
+            <Button variant="outline" onClick={handleExportCsv} disabled={exportingCsv}>
+              {exportingCsv ? "Exporting CSV..." : "Export CSV"}
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={() => document.getElementById(fileInputId)?.click()}
+              disabled={importing}
+            >
+              {importing ? "Importing..." : "Import posts"}
+            </Button>
+            <Button asChild>
+              <Link to="/posts/new">Create Post</Link>
+            </Button>
+          </>
+        }
+      />
 
       {error && (
         <div className="mt-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">

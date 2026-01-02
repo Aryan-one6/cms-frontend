@@ -9,6 +9,17 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import PageHeader from "@/components/PageHeader";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { buildAssetUrl } from "@/lib/media";
 import type { UploadResponse } from "@/lib/upload";
 import { generateSeoDraft } from "@/lib/ai";
@@ -31,6 +42,7 @@ export default function PostCreatePage() {
 
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
+  const [showPaywall, setShowPaywall] = useState(false);
 
   async function handleFileChange(e: ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -77,7 +89,11 @@ export default function PostCreatePage() {
 
       navigate(`/posts/${res.data.post.id}/edit`);
     } catch (err: any) {
-      setError("Failed to create post");
+      const msg = err?.response?.data?.message || err?.response?.data?.detail || "Failed to create post";
+      setError(msg);
+      if (typeof msg === "string" && msg.toLowerCase().includes("free plan limit")) {
+        setShowPaywall(true);
+      }
     } finally {
       setSaving(false);
     }
@@ -135,30 +151,31 @@ export default function PostCreatePage() {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div className="space-y-1">
-            <p className="text-sm uppercase tracking-wide text-slate-400">Compose</p>
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm">Publishing tips</CardTitle>
-                <CardDescription>Use tags for discovery and keep the excerpt concise.</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-3 text-xs text-slate-500">
-                <div>Preview updates automatically while you type. Publish as a draft now and finalize later.</div>
-              </CardContent>
-            </Card>
-            <h1 className="text-2xl font-semibold text-slate-900">Create new post</h1>
-            <p className="text-sm text-slate-500">Draft your article, add metadata, and preview it live.</p>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <Button variant="outline" asChild>
-              <Link to="/posts">Back to posts</Link>
-            </Button>
-            <Button type="submit" form="post-form" disabled={saving}>
-              {saving ? "Creating..." : "Publish draft"}
-            </Button>
-          </div>
-        </div>
+        <PageHeader
+          eyebrow="Compose"
+          title="Create new post"
+          description="Draft your article, add metadata, and preview it live."
+          actions={
+            <>
+              <Button variant="outline" asChild>
+                <Link to="/posts">Back to posts</Link>
+              </Button>
+              <Button type="submit" form="post-form" disabled={saving}>
+                {saving ? "Creating..." : "Publish draft"}
+              </Button>
+            </>
+          }
+          aside={
+            <div className="space-y-3">
+              <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Publishing tips</div>
+              <div className="text-sm font-semibold text-slate-900">Keep the excerpt focused</div>
+              <div className="text-xs text-slate-500">
+                Use tags for discovery and preview updates automatically while you type. Publish as a draft now and
+                finalize later.
+              </div>
+            </div>
+          }
+        />
 
         {error && (
           <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>
@@ -185,7 +202,7 @@ export default function PostCreatePage() {
                       type="button"
                       onClick={handleGenerate}
                       disabled={aiLoading}
-                      className="whitespace-nowrap"
+                      className="w-full whitespace-nowrap sm:w-auto"
                     >
                       {aiLoading ? "Generating…" : "Generate content"}
                     </Button>
@@ -249,23 +266,29 @@ export default function PostCreatePage() {
                       value={aiTopic}
                       onChange={(e) => setAiTopic(e.target.value)}
                     />
-                    <div className="grid gap-2 md:grid-cols-3">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
                       <input
                         type="file"
                         accept="image/*"
                         onChange={handleFileChange}
-                        className="block w-full text-sm text-slate-600 file:mr-4 file:rounded-md file:border-0 file:bg-slate-900 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-slate-800"
+                        className="block w-full text-sm text-slate-600 file:mr-4 file:rounded-md file:border-0 file:bg-slate-900 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-slate-800 sm:flex-1"
                       />
                       <Button
                         type="button"
                         variant="outline"
                         onClick={() => handleGenerateImage(aiTopic)}
                         disabled={generatingImage}
+                        className="w-full sm:w-auto"
                       >
                         {generatingImage ? "Generating…" : "AI cover image"}
                       </Button>
                       {coverImageUrl && (
-                        <Button type="button" variant="ghost" onClick={() => setCoverImageUrl("")}>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          onClick={() => setCoverImageUrl("")}
+                          className="w-full sm:w-auto"
+                        >
                           Remove image
                         </Button>
                       )}
@@ -289,10 +312,10 @@ export default function PostCreatePage() {
                 </div>
 
                 <div className="flex flex-wrap justify-end gap-2">
-                  <Button variant="outline" asChild>
+                  <Button variant="outline" asChild className="w-full sm:w-auto">
                     <Link to="/posts">Cancel</Link>
                   </Button>
-                  <Button type="submit" disabled={saving}>
+                  <Button type="submit" disabled={saving} className="w-full sm:w-auto">
                     {saving ? "Creating..." : "Create post"}
                   </Button>
                 </div>
@@ -313,6 +336,22 @@ export default function PostCreatePage() {
           </div>
         </div>
       </div>
+      <AlertDialog open={showPaywall} onOpenChange={setShowPaywall}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Upgrade for unlimited posts</AlertDialogTitle>
+            <AlertDialogDescription>
+              You’ve reached the free plan limit (2 posts). Choose a plan to unlock unlimited posts and sites.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Close</AlertDialogCancel>
+            <AlertDialogAction asChild>
+              <Link to="/pricing">View pricing</Link>
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </AdminLayout>
   );
 }

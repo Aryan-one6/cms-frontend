@@ -10,6 +10,12 @@ export type Site = {
   defaultLocale?: string | null;
   membershipRole?: string;
   siteDomains?: SiteDomain[];
+  subscription?: {
+    plan: string;
+    status: string;
+    expiresAt?: string | null;
+    startedAt?: string | null;
+  } | null;
 };
 
 export type SiteDomain = {
