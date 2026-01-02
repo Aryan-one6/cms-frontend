@@ -25,6 +25,7 @@ type Post = {
   coverImageUrl?: string;
   contentHtml: string;
   status: "DRAFT" | "PUBLISHED";
+  updatedAt: string;
   tags: { tag: { name: string } }[];
   author: { id: string; name: string };
   canEdit?: boolean;

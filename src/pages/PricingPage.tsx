@@ -62,6 +62,9 @@ export default function PricingPage() {
         await Promise.allSettled([refresh(), refreshSites()]);
         return;
       }
+      if (!orderRes.order) {
+        throw new Error("Unable to create payment order.");
+      }
       const opts = {
         key: orderRes.keyId,
         amount: orderRes.order.amount,

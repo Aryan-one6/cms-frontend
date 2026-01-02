@@ -346,9 +346,7 @@ export default function PostCreatePage() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Close</AlertDialogCancel>
-            <AlertDialogAction asChild>
-              <Link to="/pricing">View pricing</Link>
-            </AlertDialogAction>
+            <AlertDialogAction onClick={() => navigate("/pricing")}>View pricing</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
