@@ -8,6 +8,7 @@ type Admin = {
   role: string;
   createdAt?: string;
   avatarUrl?: string | null;
+  hasPassword?: boolean;
   accountSubscription?: {
     plan: string;
     status: string;
@@ -23,6 +24,7 @@ type AuthContextType = {
   signup: (name: string, email: string, password: string, siteName: string, domain: string) => Promise<void>;
   requestPasswordReset: (email: string) => Promise<void>;
   resetPassword: (token: string, password: string) => Promise<void>;
+  setPassword: (password: string, email?: string) => Promise<void>;
   refresh: () => Promise<void>;
   logout: () => Promise<void>;
 };
@@ -62,6 +64,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await api.post("/auth/password-reset/confirm", { token, password });
   }
 
+  async function setPassword(password: string, email?: string) {
+    await api.post("/auth/password/set", { password, email });
+    await fetchMe();
+  }
+
   async function logout() {
     await api.post("/auth/logout");
     setAdmin(null);
@@ -73,7 +80,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <AuthContext.Provider
-      value={{ admin, loading, login, signup, requestPasswordReset, resetPassword, refresh: fetchMe, logout }}
+      value={{
+        admin,
+        loading,
+        login,
+        signup,
+        requestPasswordReset,
+        resetPassword,
+        setPassword,
+        refresh: fetchMe,
+        logout,
+      }}
     >
       {children}
     </AuthContext.Provider>

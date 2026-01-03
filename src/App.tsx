@@ -9,12 +9,14 @@ import PostEditPage from "./pages/PostEditPage";
 import SignupPage from "./pages/SignupPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
+import SetPasswordPage from "./pages/SetPasswordPage";
 import SitesPage from "./pages/SitesPage";
 import NewSitePage from "./pages/NewSitePage";
 import SuperAdminPage from "./pages/SuperAdminPage";
 import PostViewPage from "./pages/PostViewPage";
 import PricingPage from "./pages/PricingPage";
 import AccountPage from "./pages/AccountPage";
+import RequireAuth from "./routes/RequireAuth";
 
 import { SiteProvider } from "./lib/site";
 
@@ -27,6 +29,14 @@ export default function App() {
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
+          <Route
+            path="/set-password"
+            element={
+              <RequireAuth>
+                <SetPasswordPage />
+              </RequireAuth>
+            }
+          />
 
           <Route
             path="/"
