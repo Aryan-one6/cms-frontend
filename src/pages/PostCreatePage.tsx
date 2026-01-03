@@ -23,7 +23,7 @@ import {
 import { buildAssetUrl } from "@/lib/media";
 import type { UploadResponse } from "@/lib/upload";
 import { generateSeoDraft } from "@/lib/ai";
-import { Sparkles, Wand2, ImageIcon, Upload, Trash2 } from "lucide-react";
+import { Sparkles, Wand2, ImageIcon } from "lucide-react";
 
 
 export default function PostCreatePage() {

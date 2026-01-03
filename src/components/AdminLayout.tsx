@@ -194,7 +194,7 @@ function Sidebar({ expanded, onToggle, onNavigate }: { expanded: boolean; onTogg
 }
 
 function TopBar({ onOpenMenu }: { onOpenMenu: () => void }) {
-  const { admin, logout } = useAuth();
+  const { logout } = useAuth();
 
   return (
     <header className="sticky top-0 z-30 border-b border-slate-800 bg-[radial-gradient(100%_80%_at_0%_0%,rgba(14,165,233,0.18),transparent_70%),linear-gradient(180deg,#0f172a,#0b1223)] backdrop-blur">

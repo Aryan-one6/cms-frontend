@@ -18,7 +18,7 @@ import { useAuth } from "../lib/auth";
 import { useSite } from "@/lib/site";
 import { generateSeoDraft } from "@/lib/ai";
 import { } from "lucide-react";
-import { Sparkles, Wand2, Upload, Trash2, Image as ImageIcon, UploadCloud } from "lucide-react";
+import { Sparkles, Wand2, Trash2, Image as ImageIcon } from "lucide-react";
 
 
 type Post = {

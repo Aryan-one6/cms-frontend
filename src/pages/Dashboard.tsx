@@ -43,58 +43,6 @@ type DomainPulse = {
   verified: number;
 };
 
-function PostList({
-  title,
-  posts,
-  emptyText,
-}: {
-  title: string;
-  posts: PostSummary[];
-  emptyText: string;
-}) {
-  return (
-    <Card className="border-slate-100 shadow-sm">
-      <CardHeader className="pb-3">
-        <div className="flex items-center justify-between">
-          <CardTitle className="font-display text-base font-semibold text-slate-900">{title}</CardTitle>
-          <Badge variant="secondary" className="bg-slate-100 text-slate-600">
-            {posts.length}
-          </Badge>
-        </div>
-        <CardDescription>Latest updates in this list.</CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-3">
-        {posts.length === 0 ? (
-          <p className="text-sm text-slate-500">{emptyText}</p>
-        ) : (
-          posts.map((p) => (
-            <div
-              key={p.id}
-              className="flex flex-col items-start gap-3 rounded-xl border border-slate-100 bg-white/80 px-3 py-2.5 transition hover:border-cyan-100 hover:bg-cyan-50/40 sm:flex-row sm:items-center sm:justify-between"
-            >
-              <div className="space-y-0.5">
-                <div className="flex items-center gap-2">
-                  <Link to={`/posts/${p.id}/edit`} className="text-sm font-semibold text-slate-900 hover:text-cyan-700">
-                    {p.title}
-                  </Link>
-                  <Badge variant={p.status === "PUBLISHED" ? "default" : "secondary"}>{p.status}</Badge>
-                  {p.isMine ? <Badge variant="outline">Yours</Badge> : null}
-                </div>
-                <div className="text-xs text-slate-500">
-                  Updated {new Date(p.updatedAt).toLocaleString()} · by {p.author?.name ?? "Unknown"}
-                </div>
-              </div>
-              <Button asChild size="sm" variant="outline" className="w-full shrink-0 sm:w-auto">
-                <Link to={`/posts/${p.id}/edit`}>{p.isMine ? "Edit" : "View"}</Link>
-              </Button>
-            </div>
-          ))
-        )}
-      </CardContent>
-    </Card>
-  );
-}
-
 export default function Dashboard() {
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
