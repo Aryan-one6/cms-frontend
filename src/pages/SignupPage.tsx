@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { buildOAuthUrl } from "@/lib/oauth";
-import { Github } from "lucide-react";
+import { GoogleLogo, GithubLogo } from "@/components/SocialLogos";
 
 export default function SignupPage() {
   const { signup } = useAuth();
@@ -52,45 +52,70 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4">
-      <Card className="w-full max-w-md rounded-2xl shadow-sm">
-        <CardHeader>
-          <CardTitle className="text-lg">Create an account</CardTitle>
-          <p className="text-sm text-slate-500">Create your workspace and set up your site details.</p>
+    <div className="relative flex min-h-screen items-center justify-center bg-slate-950 px-4 py-10 text-white sm:px-6 sm:py-16">
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="absolute -left-10 top-10 h-64 w-64 rounded-full bg-cyan-500/10 blur-3xl" />
+        <div className="absolute right-0 top-32 h-72 w-72 rounded-full bg-indigo-500/10 blur-3xl" />
+        <div className="absolute bottom-0 left-1/3 h-52 w-52 rounded-full bg-emerald-400/10 blur-3xl" />
+      </div>
+
+      <Card className="relative w-full max-w-md rounded-2xl border border-slate-800 bg-slate-900/80 shadow-2xl backdrop-blur">
+        <CardHeader className="pb-4 sm:pb-6">
+          <CardTitle className="text-lg text-white sm:text-xl">Create an account</CardTitle>
+          <p className="text-sm text-slate-300">Create your workspace and set up your site details.</p>
         </CardHeader>
 
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-3">
-            <Button asChild variant="outline" className="w-full gap-2">
+        <CardContent className="pb-6 sm:pb-8">
+          <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
+            <Button
+              asChild
+              variant="outline"
+              className="w-full gap-2 border-slate-200 bg-white  hover:bg-slate-50"
+            >
               <a href={googleUrl}>
-                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-slate-100 text-xs font-semibold text-slate-600">
-                  G
-                </span>
-                Sign up with Google
+                <GoogleLogo className="h-5 w-5" />
+                Continue with Google
               </a>
             </Button>
 
-            <Button asChild variant="outline" className="w-full gap-2">
+            <Button
+              asChild
+              variant="outline"
+              className="w-full gap-2 "
+            >
               <a href={githubUrl}>
-                <Github className="h-4 w-4" />
-                Sign up with GitHub
+                <GithubLogo className="h-5 w-5 border-full border-[#0f1116]" />
+                Continue with GitHub
               </a>
             </Button>
-
             <div className="flex items-center gap-2 text-xs text-slate-400">
-              <span className="h-px flex-1 bg-slate-200" />
+              <span className="h-px flex-1 bg-slate-800" />
               or use email
-              <span className="h-px flex-1 bg-slate-200" />
+              <span className="h-px flex-1 bg-slate-800" />
             </div>
 
-            <Input placeholder="Full name" value={name} onChange={(e) => setName(e.target.value)} required />
-            <Input placeholder="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+            <Input
+              placeholder="Full name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+              className="border-slate-800 bg-slate-900/60 text-white placeholder:text-slate-400"
+            />
+            <Input
+              placeholder="Email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="border-slate-800 bg-slate-900/60 text-white placeholder:text-slate-400"
+            />
             <Input
               type={showPassword ? "text" : "password"}
               placeholder="Password (min 6 chars)"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              className="border-slate-800 bg-slate-900/60 text-white placeholder:text-slate-400"
             />
             <Input
               type={showPassword ? "text" : "password"}
@@ -98,43 +123,46 @@ export default function SignupPage() {
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
+              className="border-slate-800 bg-slate-900/60 text-white placeholder:text-slate-400"
             />
             <button
               type="button"
-              className="text-xs text-cyan-700 hover:underline"
+              className="text-xs text-cyan-300 hover:underline"
               onClick={() => setShowPassword((p) => !p)}
             >
               {showPassword ? "Hide passwords" : "Show passwords"}
             </button>
 
-            <div className="h-px bg-slate-200" />
+            <div className="h-px bg-slate-800" />
             <div className="space-y-2">
-              <div className="text-sm font-semibold text-slate-800">Your site</div>
+              <div className="text-sm font-semibold text-white">Your site</div>
               <Input
                 placeholder="Site name (e.g., Marketing Site)"
                 value={siteName}
                 onChange={(e) => setSiteName(e.target.value)}
                 required
+                className="border-slate-800 bg-slate-900/60 text-white placeholder:text-slate-400"
               />
               <Input
                 placeholder="Primary domain (e.g., example.com)"
                 value={domain}
                 onChange={(e) => setDomain(e.target.value)}
                 required
+                className="border-slate-800 bg-slate-900/60 text-white placeholder:text-slate-400"
               />
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-slate-400">
                 We’ll use this to create your site container and generate a verification token. You can edit later.
               </p>
             </div>
 
-            {error && <p className="text-sm text-red-600">{error}</p>}
+            {error && <p className="text-sm text-red-400">{error}</p>}
 
-            <Button className="w-full bg-cyan-600 hover:bg-cyan-700" disabled={loading} type="submit">
+            <Button className="w-full bg-cyan-500 text-slate-950 hover:bg-cyan-400" disabled={loading} type="submit">
               {loading ? "Creating..." : "Create account"}
             </Button>
-            <p className="text-center text-sm text-slate-500">
+            <p className="text-center text-sm text-slate-300">
               Already have an account?{" "}
-              <Link to="/login" className="text-cyan-700 hover:underline">
+              <Link to="/login" className="text-cyan-300 hover:underline">
                 Log in
               </Link>
             </p>

@@ -141,7 +141,7 @@ export default function Dashboard() {
 
   return (
     <AdminLayout>
-      <div className="space-y-8">
+      <div className="space-y-4">
         <PageHeader
           eyebrow={
             <Badge variant="secondary" className="w-fit gap-2 bg-slate-900 text-white">
@@ -187,39 +187,62 @@ export default function Dashboard() {
             <>
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="text-xs uppercase tracking-[0.2em] text-slate-500">AI signal board</div>
-                  <div className="font-display text-lg font-semibold text-slate-900">Workspace intelligence</div>
+                  <div className="text-[10px] uppercase tracking-wider text-slate-500">
+                    AI signal board
+                  </div>
+                  <div className="font-display text-base font-semibold text-slate-900">
+                    Workspace intelligence
+                  </div>
                 </div>
-                <div className="rounded-full bg-cyan-50 p-2 text-cyan-700">
-                  <BarChart3 className="h-4 w-4" />
+                <div className="rounded-full bg-cyan-50 p-1.5 text-cyan-700">
+                  <BarChart3 className="h-3.5 w-3.5" />
                 </div>
               </div>
-              <div className="mt-5 space-y-4 text-sm">
+
+              <div className="mt-3 space-y-3 text-sm">
+                {/* Content readiness */}
                 <div>
-                  <div className="flex items-center justify-between text-xs text-slate-500">
+                  <div className="flex items-center justify-between text-[11px] text-slate-500">
                     <span>Content readiness</span>
                     <span>{publishRate}%</span>
                   </div>
-                  <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-slate-100">
-                    <div className="h-full rounded-full bg-cyan-600" style={{ width: `${publishRate}%` }} />
+                  <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
+                    <div
+                      className="h-full rounded-full bg-cyan-600"
+                      style={{ width: `${publishRate}%` }}
+                    />
                   </div>
                 </div>
+
+                {/* Domain coverage */}
                 <div>
-                  <div className="flex items-center justify-between text-xs text-slate-500">
+                  <div className="flex items-center justify-between text-[11px] text-slate-500">
                     <span>Domain coverage</span>
                     <span>{domainRate}%</span>
                   </div>
-                  <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-slate-100">
-                    <div className="h-full rounded-full bg-slate-900" style={{ width: `${domainRate}%` }} />
+                  <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
+                    <div
+                      className="h-full rounded-full bg-slate-900"
+                      style={{ width: `${domainRate}%` }}
+                    />
                   </div>
                 </div>
-                <div className="rounded-xl border border-slate-100 bg-white px-4 py-3">
-                  <div className="text-xs uppercase tracking-[0.2em] text-slate-500">AI stack</div>
-                  <div className="mt-1 text-base font-semibold text-slate-900">Draft + Cover + SEO</div>
-                  <div className="text-xs text-slate-500">Automation modules active for this site.</div>
+
+                {/* AI stack */}
+                <div className="rounded-lg border border-slate-100 bg-white px-3 py-2">
+                  <div className="text-[10px] uppercase tracking-wider text-slate-500">
+                    AI stack
+                  </div>
+                  <div className="text-sm font-semibold text-slate-900">
+                    Draft + Cover + SEO
+                  </div>
+                  <div className="text-[11px] text-slate-500">
+                    Automation modules active
+                  </div>
                 </div>
               </div>
             </>
+
           }
         />
 
@@ -254,68 +277,72 @@ export default function Dashboard() {
             </CardContent>
           </Card>
         )}
-
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4 animate-in fade-in slide-in-from-bottom-2 duration-500 delay-100">
-          <Card className="border-slate-100">
-            <CardHeader className="pb-3">
+        <div className="grid gap-2 md:grid-cols-2 xl:grid-cols-4 animate-in fade-in slide-in-from-bottom-2 duration-500 delay-100">
+          <Card>
+            <CardContent className="space-y-1.5 p-3">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-sm text-slate-600">Total posts</CardTitle>
-                <div className="rounded-full bg-cyan-50 p-2 text-cyan-700">
-                  <FileText className="h-4 w-4" />
-                </div>
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-700">
+                  Total posts
+                </span>
+                <span className="rounded-full bg-gradient-to-br from-cyan-400/40 to-indigo-500/30 p-1.5">
+                  <FileText className="h-3.5 w-3.5 text-slate-900" />
+                </span>
               </div>
-              <CardDescription>Across your workspace</CardDescription>
-            </CardHeader>
-            <CardContent className="text-3xl font-semibold text-slate-900">
-              {loading ? "…" : totalPosts}
+              <div className="text-xl font-semibold text-slate-900">
+                {loading ? "…" : totalPosts}
+              </div>
             </CardContent>
           </Card>
 
-          <Card className="border-slate-100">
-            <CardHeader className="pb-3">
+          <Card>
+            <CardContent className="space-y-1.5 p-3">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-sm text-slate-600">Published</CardTitle>
-                <div className="rounded-full bg-emerald-50 p-2 text-emerald-700">
-                  <CheckCircle2 className="h-4 w-4" />
-                </div>
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-700">
+                  Published
+                </span>
+                <span className="rounded-full bg-gradient-to-br from-emerald-400/40 to-cyan-500/30 p-1.5">
+                  <CheckCircle2 className="h-3.5 w-3.5 text-slate-900" />
+                </span>
               </div>
-              <CardDescription>Live articles</CardDescription>
-            </CardHeader>
-            <CardContent className="text-3xl font-semibold text-slate-900">
-              {loading ? "…" : myPublished}
+              <div className="text-xl font-semibold text-slate-900">
+                {loading ? "…" : myPublished}
+              </div>
             </CardContent>
           </Card>
 
-          <Card className="border-slate-100">
-            <CardHeader className="pb-3">
+          <Card>
+            <CardContent className="space-y-1.5 p-3">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-sm text-slate-600">Drafts in flight</CardTitle>
-                <div className="rounded-full bg-sky-50 p-2 text-sky-700">
-                  <Clock3 className="h-4 w-4" />
-                </div>
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-700">
+                  Drafts
+                </span>
+                <span className="rounded-full bg-gradient-to-br from-sky-400/40 to-indigo-400/30 p-1.5">
+                  <Clock3 className="h-3.5 w-3.5 text-slate-900" />
+                </span>
               </div>
-              <CardDescription>Work in progress</CardDescription>
-            </CardHeader>
-            <CardContent className="text-3xl font-semibold text-slate-900">
-              {loading ? "…" : myDrafts}
+              <div className="text-xl font-semibold text-slate-900">
+                {loading ? "…" : myDrafts}
+              </div>
             </CardContent>
           </Card>
 
-          <Card className="border-slate-100">
-            <CardHeader className="pb-3">
+          <Card>
+            <CardContent className="space-y-1.5 p-3">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-sm text-slate-600">Domains verified</CardTitle>
-                <div className="rounded-full bg-slate-100 p-2 text-slate-700">
-                  <Globe className="h-4 w-4" />
-                </div>
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-700">
+                  Domains
+                </span>
+                <span className="rounded-full bg-gradient-to-br from-slate-200/40 to-slate-500/30 p-1.5">
+                  <Globe className="h-3.5 w-3.5 text-slate-900" />
+                </span>
               </div>
-              <CardDescription>Delivery trusted</CardDescription>
-            </CardHeader>
-            <CardContent className="text-3xl font-semibold text-slate-900">
-              {loading ? "…" : `${domainPulse.verified}/${domainPulse.total}`}
+              <div className="text-xl font-semibold text-slate-900">
+                {loading ? "…" : `${domainPulse.verified}/${domainPulse.total}`}
+              </div>
             </CardContent>
           </Card>
         </div>
+
 
         <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] animate-in fade-in slide-in-from-bottom-2 duration-500 delay-200">
           <Card className="border-slate-100 bg-slate-50/60">
@@ -410,48 +437,9 @@ export default function Dashboard() {
           </Card>
         </div>
 
-        <div className="grid gap-4 animate-in fade-in slide-in-from-bottom-2 duration-500 delay-300">
-          <PostList
-            title="Your recent posts"
-            posts={data?.myRecentPosts ?? []}
-            emptyText="You haven't created any posts yet."
-          />
-        </div>
 
-        <Card className="border-slate-100 animate-in fade-in slide-in-from-bottom-2 duration-500 delay-300">
-          <CardHeader className="pb-3">
-            <CardTitle className="font-display text-base font-semibold text-slate-900">Recent activity</CardTitle>
-            <CardDescription>Latest updates from everyone.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {(data?.recentActivity ?? []).length === 0 ? (
-              <p className="text-sm text-slate-500">{loading ? "Loading activity…" : "No recent updates yet."}</p>
-            ) : (
-              (data?.recentActivity ?? []).map((item) => (
-                <div
-                  key={item.id}
-                  className="flex flex-col items-start gap-3 rounded-xl border border-slate-100 bg-white/80 px-3 py-2.5 sm:flex-row sm:items-center sm:justify-between"
-                >
-                  <div className="space-y-0.5">
-                    <div className="flex items-center gap-2">
-                      <Link to={`/posts/${item.id}/edit`} className="text-sm font-semibold text-slate-900 hover:text-cyan-700">
-                        {item.title}
-                      </Link>
-                      <Badge variant={item.status === "PUBLISHED" ? "default" : "secondary"}>{item.status}</Badge>
-                      {item.isMine ? <Badge variant="outline">Yours</Badge> : null}
-                    </div>
-                    <div className="text-xs text-slate-500">
-                      Updated {new Date(item.updatedAt).toLocaleString()} · by {item.author?.name ?? "Unknown"}
-                    </div>
-                  </div>
-                  <Button asChild size="sm" variant="ghost" className="w-full sm:w-auto">
-                    <Link to={`/posts/${item.id}/edit`}>{item.isMine ? "Edit" : "View"}</Link>
-                  </Button>
-                </div>
-              ))
-            )}
-          </CardContent>
-        </Card>
+
+
       </div>
     </AdminLayout>
   );

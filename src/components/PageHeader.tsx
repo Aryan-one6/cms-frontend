@@ -26,12 +26,12 @@ export default function PageHeader({
   return (
     <section
       className={cn(
-        "relative overflow-hidden rounded-3xl border border-slate-100 bg-[radial-gradient(90%_120%_at_10%_0%,rgba(14,165,164,0.18),transparent_70%),radial-gradient(100%_100%_at_90%_0%,rgba(56,189,248,0.16),transparent_60%),linear-gradient(180deg,#ffffff,#eff6ff)] shadow-sm",
+        "relative overflow-hidden rounded-2xl border border-slate-100 bg-[radial-gradient(90%_120%_at_10%_0%,rgba(14,165,164,0.18),transparent_70%),radial-gradient(100%_100%_at_90%_0%,rgba(56,189,248,0.16),transparent_60%),linear-gradient(180deg,#ffffff,#eff6ff)] shadow-sm",
         className
       )}
     >
-      <div className="absolute -right-20 -top-20 h-52 w-52 rounded-full bg-cyan-200/30 blur-3xl" />
-      <div className="absolute -left-10 top-20 h-48 w-48 rounded-full bg-sky-200/30 blur-3xl" />
+      <div className="absolute -right-20 -top-20 h-22 w-52 rounded-full bg-cyan-200/30 blur-3xl" />
+      <div className="absolute -left-10 top-20 h-32 w-48 rounded-full bg-sky-200/30 blur-3xl" />
       <div
         className={cn(
           "relative grid gap-6 p-6 md:p-8",

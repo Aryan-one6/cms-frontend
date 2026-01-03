@@ -23,6 +23,8 @@ import {
 import { buildAssetUrl } from "@/lib/media";
 import type { UploadResponse } from "@/lib/upload";
 import { generateSeoDraft } from "@/lib/ai";
+import { Sparkles, Wand2, ImageIcon, Upload, Trash2 } from "lucide-react";
+
 
 export default function PostCreatePage() {
   const navigate = useNavigate();
@@ -181,36 +183,76 @@ export default function PostCreatePage() {
           <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>
         )}
 
-        <div className="grid items-start gap-6 xl:grid-cols-2">
-          <Card className="xl:col-span-1">
+        <div className="grid items-start gap-2 xl:grid-cols-2">
+          <Card className="xl:col-span-1 bg-transparent shadow-none border-0 px-0 w-full">
             <CardHeader>
               <CardTitle>Post details</CardTitle>
               <CardDescription>Title, summary, tags, cover image, and the main content.</CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent >
               <form id="post-form" onSubmit={handleCreate} className="space-y-6">
-                <div className="space-y-2 rounded-lg border border-slate-200 bg-slate-50 p-4">
+
+
+                <div className="relative overflow-hidden rounded-2xl border border-cyan-300/30 bg-gradient-to-br from-cyan-50 via-white to-indigo-50 p-5 shadow-sm">
+
+                  {/* background neural glow */}
+                  <div className="pointer-events-none absolute -top-24 -right-24 h-64 w-64 rounded-full bg-cyan-400/20 blur-3xl" />
+                  <div className="pointer-events-none absolute -bottom-24 -left-24 h-64 w-64 rounded-full bg-indigo-400/20 blur-3xl" />
+
+                  {/* header */}
+                  <div className="mb-3 flex items-center gap-2">
+                    <div className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-cyan-500 to-indigo-500 text-white shadow">
+                      <Sparkles className="h-4 w-4" />
+                    </div>
+                    <div>
+                      <div className="text-[10px] uppercase tracking-widest text-cyan-700">
+                        AI powered
+                      </div>
+                      <div className="text-sm font-semibold text-slate-900">
+                        Content generation
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* input + action */}
                   <div className="flex flex-wrap items-center gap-3">
                     <Input
                       value={aiTopic}
                       onChange={(e) => setAiTopic(e.target.value)}
-                      placeholder="Topic or keywords for AI draft"
+                      placeholder="Topic, keywords, or intent…"
                       disabled={aiLoading}
-                      className="min-w-[240px] flex-1 rounded-md"
+                      className="min-w-[240px] flex-1 rounded-xl border-slate-200 bg-white/90
+                 shadow-inner focus-visible:ring-2 focus-visible:ring-cyan-500"
                     />
+
                     <Button
                       type="button"
                       onClick={handleGenerate}
                       disabled={aiLoading}
-                      className="w-full whitespace-nowrap sm:w-auto"
+                      className="group relative w-full sm:w-auto overflow-hidden rounded-xl
+                 bg-gradient-to-br from-cyan-600 via-indigo-600 to-violet-600
+                 px-5 py-2.5 text-white shadow-lg transition-all
+                 hover:scale-[1.02] hover:shadow-xl
+                 focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2
+                 disabled:scale-100 disabled:opacity-70"
                     >
-                      {aiLoading ? "Generating…" : "Generate content"}
+                      {/* animated glow */}
+                      <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 blur-sm transition-opacity group-hover:opacity-100" />
+
+                      <span className="relative z-10 flex items-center gap-2">
+                        <Wand2 className={`h-4 w-4 ${aiLoading ? "animate-pulse" : ""}`} />
+                        {aiLoading ? "Generating…" : "Generate with AI"}
+                      </span>
                     </Button>
                   </div>
-                  <p className="text-xs text-slate-500">
-                    Fills all fields with an AI draft (title up to 12 words, excerpt up to 40 words, up to 6 tags).
+
+                  {/* helper text */}
+                  <p className="mt-3 text-[11px] text-slate-500">
+                    AI drafts title, excerpt, and tags instantly. Everything remains fully editable.
                   </p>
                 </div>
+
+
 
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-slate-700">Title</label>
@@ -222,6 +264,7 @@ export default function PostCreatePage() {
                       if (!slugDirty) setSlug(toSlug(val));
                     }}
                     placeholder="A captivating title"
+                    className="border-1 border-slate-300 bg-white/50"
                     required
                   />
                 </div>
@@ -235,6 +278,8 @@ export default function PostCreatePage() {
                       setSlugDirty(true);
                     }}
                     placeholder="my-awesome-post"
+                    className="border-1 border-slate-300 bg-white/50"
+
                   />
                   <p className="text-xs text-slate-500">Used in URLs. Leave blank to auto-generate from the title.</p>
                 </div>
@@ -246,20 +291,29 @@ export default function PostCreatePage() {
                     onChange={(e) => setExcerpt(e.target.value)}
                     placeholder="Short description for listings and SEO"
                     rows={3}
+                    className="border-1 border-slate-300 bg-white/50"
+
                   />
                 </div>
 
-                <div className="grid gap-4 md:grid-cols-2">
+                <div className=" gap-4 ">
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-slate-700">Tags</label>
                     <Input
                       value={tagsText}
                       onChange={(e) => setTagsText(e.target.value)}
                       placeholder="design, ui, product"
+                      className="border-1 border-slate-300 bg-white/50"
+
                     />
                     <p className="text-xs text-slate-500">Comma-separated. Shown as badges on the article.</p>
                   </div>
-                  <div className="space-y-2">
+
+                </div>
+
+
+
+                {/* <div className="space-y-2">
                     <label className="text-sm font-medium text-slate-700">Cover image</label>
                     <Input
                       placeholder="Image prompt (optional, used for AI cover)"
@@ -303,8 +357,103 @@ export default function PostCreatePage() {
                         <img src={coverFullUrl} alt="cover" className="h-36 w-full object-contain bg-slate-50" />
                       </div>
                     )}
+                  </div> */}
+
+
+
+                <div className="relative space-y-2.5 overflow-hidden rounded-2xl border border-cyan-300/30 bg-gradient-to-br from-cyan-50 via-white to-indigo-50 p-4 shadow-sm">
+                  {/* soft neural glow */}
+                  <div className="pointer-events-none absolute -top-20 -right-20 h-56 w-56 rounded-full bg-cyan-400/20 blur-3xl" />
+                  <div className="pointer-events-none absolute -bottom-20 -left-20 h-56 w-56 rounded-full bg-indigo-400/20 blur-3xl" />
+
+                  {/* header */}
+                  <div className="flex items-center gap-2">
+                    <div className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-cyan-500 to-indigo-500 text-white shadow">
+                      <ImageIcon className="h-4 w-4" />
+                    </div>
+                    <div>
+                      <div className="text-[10px] uppercase tracking-widest text-cyan-700">
+                        AI powered
+                      </div>
+                      <div className="text-sm font-semibold text-slate-900">
+                        Cover image
+                      </div>
+                    </div>
                   </div>
+
+                  {/* prompt */}
+                  <Input
+                    placeholder="Image prompt (optional, used for AI cover)"
+                    value={aiTopic}
+                    onChange={(e) => setAiTopic(e.target.value)}
+                    className="rounded-xl border-slate-200 bg-white/90 shadow-inner focus-visible:ring-2 focus-visible:ring-cyan-500"
+                  />
+
+                  {/* actions */}
+                  <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+                    {/* keep your real file input, just make it compact + themed */}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFileChange}
+                      className="block w-full text-sm text-slate-600 sm:flex-1
+        file:mr-3 file:rounded-lg file:border-0
+        file:bg-gradient-to-br file:from-slate-900 file:to-slate-800
+        file:px-3 file:py-2 file:text-xs file:font-semibold file:text-white
+        hover:file:from-slate-800 hover:file:to-slate-700"
+                    />
+
+                    <Button
+                      type="button"
+                      onClick={() => handleGenerateImage(aiTopic)}
+                      disabled={generatingImage}
+                      className="group relative w-full sm:w-auto overflow-hidden rounded-xl
+                 bg-gradient-to-br from-cyan-600 via-indigo-600 to-violet-600
+                 px-4 py-2 text-white shadow-lg transition-all
+                 hover:scale-[1.02] hover:shadow-xl
+                 focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2
+                 disabled:scale-100 disabled:opacity-70"
+                    >
+                      <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 blur-sm transition-opacity group-hover:opacity-100" />
+                      <span className="relative z-10 flex items-center gap-2">
+                        <Wand2 className={`h-4 w-4 ${generatingImage ? "animate-pulse" : ""}`} />
+                        {generatingImage ? "Generating…" : "AI cover image"}
+                      </span>
+                    </Button>
+
+                    {coverImageUrl && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        onClick={() => setCoverImageUrl("")}
+                        className="w-full sm:w-auto rounded-xl text-slate-600 hover:bg-slate-100"
+                      >
+                        <Trash2 className="mr-1 h-4 w-4" />
+                        Remove
+                      </Button>
+                    )}
+                  </div>
+
+                  {/* meta */}
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-slate-500">
+                    <span>PNG, JPG up to 5MB</span>
+                    {uploading && <span className="text-slate-700">Uploading…</span>}
+                    {generatingImage && <span className="text-slate-700">Creating image…</span>}
+                  </div>
+
+                  {/* preview */}
+                  {coverImageUrl && (
+                    <div className="overflow-hidden rounded-xl border border-slate-200 bg-slate-50 shadow-inner">
+                      <img
+                        src={coverFullUrl}
+                        alt="cover"
+                        className="h-36 w-full object-contain bg-slate-50"
+                      />
+                    </div>
+                  )}
                 </div>
+
+
 
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-slate-700">Content</label>
@@ -323,7 +472,7 @@ export default function PostCreatePage() {
             </CardContent>
           </Card>
 
-          <div className="space-y-4 xl:sticky xl:top-6">
+          <div className="space-x-3 xl:sticky xl:top-6">
             <BlogPreview
               title={title}
               excerpt={excerpt}
@@ -332,7 +481,7 @@ export default function PostCreatePage() {
               tags={tagList}
             />
 
-           
+
           </div>
         </div>
       </div>

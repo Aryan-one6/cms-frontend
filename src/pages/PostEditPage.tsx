@@ -6,6 +6,7 @@ import BlogPreview from "../components/BlogPreview";
 import RichTextEditor from "../components/RichTextEditor";
 import AdminLayout from "@/components/AdminLayout";
 import PageHeader from "@/components/PageHeader";
+import AuthLoader from "@/components/AuthLoader";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -16,6 +17,9 @@ import type { UploadResponse } from "@/lib/upload";
 import { useAuth } from "../lib/auth";
 import { useSite } from "@/lib/site";
 import { generateSeoDraft } from "@/lib/ai";
+import { } from "lucide-react";
+import { Sparkles, Wand2, Upload, Trash2, Image as ImageIcon, UploadCloud } from "lucide-react";
+
 
 type Post = {
   id: string;
@@ -231,7 +235,7 @@ export default function PostEditPage() {
   if (!post) {
     return (
       <AdminLayout>
-        <div className="p-6 text-sm text-slate-500">Loading post…</div>
+        <AuthLoader />
       </AdminLayout>
     );
   }
@@ -299,23 +303,83 @@ export default function PostEditPage() {
         )}
 
         <div className="grid items-start gap-6 xl:grid-cols-2">
-          <Card className="xl:col-span-1">
+          <Card className="xl:col-span-1 bg-transparent shadow-none border-0 px-0 w-full">
             <CardHeader>
               <CardTitle>Content & metadata</CardTitle>
               <CardDescription>Keep the SEO basics strong and content polished.</CardDescription>
             </CardHeader>
             <CardContent>
               <form id="edit-form" onSubmit={handleSave} className="space-y-6">
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-700">Title</label>
-              <Input
-                value={title}
-                onChange={(e) => {
+                <div className="relative overflow-hidden rounded-2xl border border-cyan-300/30 bg-gradient-to-br from-cyan-50 via-white to-indigo-50 p-5 shadow-sm">
+
+                  {/* background neural glow */}
+                  <div className="pointer-events-none absolute -top-24 -right-24 h-64 w-64 rounded-full bg-cyan-400/20 blur-3xl" />
+                  <div className="pointer-events-none absolute -bottom-24 -left-24 h-64 w-64 rounded-full bg-indigo-400/20 blur-3xl" />
+
+                  {/* header */}
+                  <div className="mb-3 flex items-center gap-2">
+                    <div className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-cyan-500 to-indigo-500 text-white shadow">
+                      <Sparkles className="h-4 w-4" />
+                    </div>
+                    <div>
+                      <div className="text-[10px] uppercase tracking-widest text-cyan-700">
+                        AI powered
+                      </div>
+                      <div className="text-sm font-semibold text-slate-900">
+                        Content generation
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* input + action */}
+                  <div className="flex flex-wrap items-center gap-3">
+                    <Input
+                      value={aiTopic}
+                      onChange={(e) => setAiTopic(e.target.value)}
+                      placeholder="Topic, keywords, or intent…"
+                      disabled={aiLoading}
+                      className="min-w-[240px] flex-1 rounded-xl border-slate-200 bg-white/90
+                 shadow-inner focus-visible:ring-2 focus-visible:ring-cyan-500"
+                    />
+
+                    <Button
+                      type="button"
+                      onClick={handleGenerate}
+                      disabled={aiLoading}
+                      className="group relative w-full sm:w-auto overflow-hidden rounded-xl
+                 bg-gradient-to-br from-cyan-600 via-indigo-600 to-violet-600
+                 px-5 py-2.5 text-white shadow-lg transition-all
+                 hover:scale-[1.02] hover:shadow-xl
+                 focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2
+                 disabled:scale-100 disabled:opacity-70"
+                    >
+                      {/* animated glow */}
+                      <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 blur-sm transition-opacity group-hover:opacity-100" />
+
+                      <span className="relative z-10 flex items-center gap-2">
+                        <Wand2 className={`h-4 w-4 ${aiLoading ? "animate-pulse" : ""}`} />
+                        {aiLoading ? "Generating…" : "Generate with AI"}
+                      </span>
+                    </Button>
+                  </div>
+
+                  {/* helper text */}
+                  <p className="mt-3 text-[11px] text-slate-500">
+                    AI drafts title, excerpt, and tags instantly. Everything remains fully editable.
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-slate-700">Title</label>
+                  <Input
+                    value={title}
+                    onChange={(e) => {
                       setTitle(e.target.value);
                       if (!slugDirty) setSlug(toSlug(e.target.value));
                     }}
                     required
                     disabled={readOnly}
+                                        className="border-1 border-slate-300 bg-white/50"
+
                   />
                 </div>
 
@@ -323,9 +387,12 @@ export default function PostEditPage() {
                   <label className="text-sm font-medium text-slate-700">Slug</label>
                   <Input
                     value={slug}
+                                        className="border-1 border-slate-300 bg-white/50"
+
                     onChange={(e) => {
                       setSlug(e.target.value);
                       setSlugDirty(true);
+                      
                     }}
                     placeholder="my-awesome-post"
                     disabled={readOnly}
@@ -338,73 +405,133 @@ export default function PostEditPage() {
                   <Textarea
                     value={excerpt}
                     onChange={(e) => setExcerpt(e.target.value)}
+                                        className="border-1 border-slate-300 bg-white/50"
+
                     placeholder="Short description for listings and SEO"
                     rows={3}
                     disabled={readOnly}
                   />
                 </div>
 
-                <div className="grid gap-4 md:grid-cols-2">
+                <div className="grid gap-4 md:grid-cols-1">
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-slate-700">Tags</label>
                     <Input
                       value={tagsText}
                       onChange={(e) => setTagsText(e.target.value)}
+                                          className="border-1 border-slate-300 bg-white/50"
+
                       placeholder="design, ui, product"
                       disabled={readOnly}
                     />
                     <p className="text-xs text-slate-500">Comma-separated. Shown as badges on the article.</p>
                   </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-slate-700">Cover image</label>
-                    <Input
-                      placeholder="Image prompt (optional, used for AI cover)"
-                      value={aiTopic}
-                      onChange={(e) => setAiTopic(e.target.value)}
-                      disabled={readOnly}
-                    />
-                    <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleFileChange}
-                        className="block w-full text-sm text-slate-600 file:mr-4 file:rounded-md file:border-0 file:bg-slate-900 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-slate-800 disabled:cursor-not-allowed sm:flex-1"
-                        disabled={readOnly}
-                      />
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={() => handleGenerateImage(aiTopic)}
-                        disabled={generatingImage || readOnly}
-                        className="w-full sm:w-auto"
-                      >
-                        {generatingImage ? "Generating…" : "AI cover image"}
-                      </Button>
-                      {coverImageUrl && (
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          onClick={() => !readOnly && setCoverImageUrl("")}
-                          disabled={readOnly}
-                          className="w-full sm:w-auto"
-                        >
-                          Remove image
-                        </Button>
-                      )}
-                    </div>
-                    <div className="flex items-center gap-2 text-xs text-slate-500">
-                      <span>PNG, JPG up to 5MB.</span>
-                      {uploading && <span className="text-slate-700">Uploading…</span>}
-                      {generatingImage && <span className="text-slate-700">Creating image…</span>}
-                    </div>
-                    {coverImageUrl && (
-                      <div className="overflow-hidden rounded-lg border border-slate-200 bg-slate-50">
-                        <img src={coverFullUrl} alt="cover" className="h-36 w-full object-contain bg-slate-50" />
-                      </div>
-                    )}
-                  </div>
+
+
                 </div>
 
+                <div className="relative space-y-2.5 overflow-hidden rounded-2xl border border-cyan-300/30 bg-gradient-to-br from-cyan-50 via-white to-indigo-50 p-4 shadow-sm">
+                  {/* soft neural glow */}
+                  <div className="pointer-events-none absolute -top-20 -right-20 h-56 w-56 rounded-full bg-cyan-400/20 blur-3xl" />
+                  <div className="pointer-events-none absolute -bottom-20 -left-20 h-56 w-56 rounded-full bg-indigo-400/20 blur-3xl" />
+
+                  {/* header */}
+                  <div className="flex items-center gap-2">
+                    <div className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-cyan-500 to-indigo-500 text-white shadow">
+                      <ImageIcon className="h-4 w-4" />
+                    </div>
+
+                    <div className="flex-1">
+                      <div className="text-[10px] uppercase tracking-widest text-cyan-700">
+                        AI powered
+                      </div>
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="text-sm font-semibold text-slate-900">Cover image</div>
+
+                        {/* optional lock badge when readOnly */}
+                        {readOnly && (
+                          <span className="rounded-full bg-slate-900/5 px-2 py-0.5 text-[10px] font-semibold text-slate-600">
+                            Read-only
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* prompt */}
+                  <Input
+                    placeholder="Image prompt (optional, used for AI cover)"
+                    value={aiTopic}
+                    onChange={(e) => setAiTopic(e.target.value)}
+                    disabled={readOnly}
+                    className="rounded-xl border-slate-200 bg-white/90 shadow-inner focus-visible:ring-2 focus-visible:ring-cyan-500 disabled:opacity-70"
+                  />
+
+                  {/* actions */}
+                  <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFileChange}
+                      disabled={readOnly}
+                      className="block w-full text-sm text-slate-600 sm:flex-1
+        file:mr-3 file:rounded-lg file:border-0
+        file:bg-gradient-to-br file:from-slate-900 file:to-slate-800
+        file:px-3 file:py-2 file:text-xs file:font-semibold file:text-white
+        hover:file:from-slate-800 hover:file:to-slate-700
+        disabled:cursor-not-allowed disabled:opacity-70"
+                    />
+
+                    <Button
+                      type="button"
+                      onClick={() => handleGenerateImage(aiTopic)}
+                      disabled={generatingImage || readOnly}
+                      className="group relative w-full sm:w-auto overflow-hidden rounded-xl
+        bg-gradient-to-br from-cyan-600 via-indigo-600 to-violet-600
+        px-4 py-2 text-white shadow-lg transition-all
+        hover:scale-[1.02] hover:shadow-xl
+        focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2
+        disabled:scale-100 disabled:opacity-70"
+                    >
+                      <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 blur-sm transition-opacity group-hover:opacity-100" />
+                      <span className="relative z-10 flex items-center gap-2">
+                        <Wand2 className={`h-4 w-4 ${generatingImage ? "animate-pulse" : ""}`} />
+                        {generatingImage ? "Generating…" : "AI cover image"}
+                      </span>
+                    </Button>
+
+                    {coverImageUrl && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        onClick={() => !readOnly && setCoverImageUrl("")}
+                        disabled={readOnly}
+                        className="w-full sm:w-auto rounded-xl text-slate-600 hover:bg-slate-100 disabled:opacity-70"
+                      >
+                        <Trash2 className="mr-1 h-4 w-4" />
+                        Remove
+                      </Button>
+                    )}
+                  </div>
+
+                  {/* meta */}
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-slate-500">
+                    <span>PNG, JPG up to 5MB</span>
+                    {uploading && <span className="text-slate-700">Uploading…</span>}
+                    {generatingImage && <span className="text-slate-700">Creating image…</span>}
+                  </div>
+
+                  {/* preview */}
+                  {coverImageUrl && (
+                    <div className="overflow-hidden rounded-xl border border-slate-200 bg-slate-50 shadow-inner">
+                      <img
+                        src={coverFullUrl}
+                        alt="cover"
+                        className="h-36 w-full object-contain bg-slate-50"
+                      />
+                    </div>
+                  )}
+                </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-slate-700">Content</label>
                   <RichTextEditor value={contentHtml} onChange={setContentHtml} readOnly={readOnly} />
@@ -423,32 +550,7 @@ export default function PostEditPage() {
           </Card>
 
           <div className="space-y-4 xl:sticky xl:top-6">
-             <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm">AI helper</CardTitle>
-                <CardDescription>Generate an SEO draft from a topic.</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-3 text-sm text-slate-600">
-                <Input
-                  placeholder="Topic for SEO draft"
-                  value={aiTopic}
-                  onChange={(e) => setAiTopic(e.target.value)}
-                  disabled={aiLoading}
-                  className="rounded-lg"
-                />
-                <Button
-                  size="sm"
-                  className="w-full rounded-lg"
-                  onClick={handleGenerate}
-                  disabled={aiLoading || readOnly}
-                >
-                  {aiLoading ? "Generating…" : "Generate SEO draft"}
-                </Button>
-                <p className="text-xs text-slate-500">
-                  Fills title, slug, excerpt, tags, and content automatically.
-                </p>
-              </CardContent>
-            </Card>
+
             <BlogPreview
               title={title}
               excerpt={excerpt}
@@ -493,7 +595,7 @@ export default function PostEditPage() {
               </CardContent>
             </Card>
 
-           
+
           </div>
         </div>
       </div>

@@ -298,9 +298,7 @@ export default function PostsPage() {
           <TableBody>
             {loading ? (
               <TableRow>
-                <TableCell colSpan={6} className="py-10 text-center text-slate-500">
-                  Loading...
-                </TableCell>
+               
               </TableRow>
             ) : posts.length === 0 ? (
               <TableRow>

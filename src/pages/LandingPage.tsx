@@ -128,7 +128,7 @@ export default function LandingPage() {
                   Healthy signal
                 </div>
               </div>
-              <div className="grid grid-cols-1 gap-4 px-5 pb-6 sm:grid-cols-2 sm:px-6">
+              <div className="grid grid-cols-1 gap-4 px-5 pb-6 sm:grid-cols-2 sm:gap-6 sm:px-6">
                 <Card className="border-white/5 bg-slate-800/60">
                   <CardHeader className="pb-2">
                     <CardTitle className="flex items-center gap-2 text-sm text-white">
@@ -164,7 +164,7 @@ export default function LandingPage() {
 
         <section className="grid md:grid-cols-3 ">
           {highlights.map(({ title, desc, icon: Icon }) => (
-            <Card key={title} className="border-slate-800 bg-slate-900/60 mb-3">
+            <Card key={title} className="border-slate-800 bg-slate-900/60 mb-3 mx-auto md:mx-5">
               <CardContent className="space-y-3 p-5">
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-800/70">
                   <Icon className="h-5 w-5 text-cyan-300" />
@@ -279,24 +279,24 @@ export default function LandingPage() {
                   <span>AI-assisted drafts</span>
                   <span className="font-semibold text-cyan-200">+128% QoQ</span>
                 </div>
-                <div className="mt-3 grid grid-cols-4 gap-3 text-xs text-slate-400">
-                  <div className="rounded-lg bg-slate-800/60 p-3">
-                    <div className="text-white">Blog</div>
-                    <div className="text-cyan-200">42</div>
-                  </div>
-                  <div className="rounded-lg bg-slate-800/60 p-3">
-                    <div className="text-white">Changelog</div>
-                    <div className="text-cyan-200">18</div>
-                  </div>
-                  <div className="rounded-lg bg-slate-800/60 p-3">
-                    <div className="text-white">Landing</div>
-                    <div className="text-cyan-200">27</div>
-                  </div>
-                  <div className="rounded-lg bg-slate-800/60 p-3">
-                    <div className="text-white">Docs</div>
-                    <div className="text-cyan-200">11</div>
-                  </div>
-                </div>
+            <div className="mt-3 grid grid-cols-2 gap-3 text-[13px] text-slate-400 sm:grid-cols-4 sm:text-xs">
+              <div className="rounded-lg bg-slate-800/60 p-3 sm:p-3.5">
+                <div className="text-white">Blog</div>
+                <div className="text-cyan-200">99+</div>
+              </div>
+              <div className="rounded-lg bg-slate-800/60 p-3 sm:p-3.5">
+                <div className="text-white">Changelog</div>
+                <div className="text-cyan-200">18</div>
+              </div>
+              <div className="rounded-lg bg-slate-800/60 p-3 sm:p-3.5">
+                <div className="text-white">Landing</div>
+                <div className="text-cyan-200">27</div>
+              </div>
+              <div className="rounded-lg bg-slate-800/60 p-3 sm:p-3.5">
+                <div className="text-white">Docs</div>
+                <div className="text-cyan-200">11</div>
+              </div>
+            </div>
               </div>
             </div>
           </div>
