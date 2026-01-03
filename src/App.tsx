@@ -10,6 +10,7 @@ import SignupPage from "./pages/SignupPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import SetPasswordPage from "./pages/SetPasswordPage";
+import LandingPage from "./pages/LandingPage";
 import SitesPage from "./pages/SitesPage";
 import NewSitePage from "./pages/NewSitePage";
 import SuperAdminPage from "./pages/SuperAdminPage";
@@ -38,8 +39,10 @@ export default function App() {
             }
           />
 
+          <Route path="/" element={<LandingPage />} />
+
           <Route
-            path="/"
+            path="/app"
             element={
               <ProtectedRoute>
                 <Dashboard />

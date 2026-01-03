@@ -16,8 +16,8 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const googleUrl = buildOAuthUrl("google", "/");
-  const githubUrl = buildOAuthUrl("github", "/");
+  const googleUrl = buildOAuthUrl("google", "/app");
+  const githubUrl = buildOAuthUrl("github", "/app");
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -32,7 +32,7 @@ export default function LoginPage() {
     setLoading(true);
     try {
       await login(email, password);
-      navigate("/");
+      navigate("/app");
     } catch (err: any) {
       const message =
         err?.response?.data?.message ||
