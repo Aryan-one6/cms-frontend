@@ -27,66 +27,12 @@ type Post = {
   canEdit: boolean;
 };
 
-function parseCsv(text: string) {
-  const rows: string[][] = [];
-  let current = "";
-  let field: string[] = [];
-  let inQuotes = false;
-
-  const pushField = () => {
-    field.push(current.replace(/""/g, '"'));
-    current = "";
-  };
-  const pushRow = () => {
-    if (field.length) rows.push(field);
-    field = [];
-  };
-
-  for (let i = 0; i < text.length; i++) {
-    const ch = text[i];
-    if (ch === '"') {
-      if (inQuotes && text[i + 1] === '"') {
-        current += '"';
-        i++;
-      } else {
-        inQuotes = !inQuotes;
-      }
-    } else if (ch === "," && !inQuotes) {
-      pushField();
-    } else if ((ch === "\n" || ch === "\r") && !inQuotes) {
-      if (ch === "\r" && text[i + 1] === "\n") i++;
-      pushField();
-      pushRow();
-    } else {
-      current += ch;
-    }
-  }
-  pushField();
-  pushRow();
-
-  if (!rows.length) return [];
-  const headers = rows[0].map((h) => h.trim().toLowerCase());
-  return rows
-    .slice(1)
-    .filter((r) => r.some((c) => c.trim().length))
-    .map((cols) => {
-      const obj: any = {};
-      headers.forEach((h, idx) => {
-        const val = (cols[idx] ?? "").trim();
-        if (h === "tags") obj.tags = val ? val.split("|").map((t) => t.trim()).filter(Boolean) : [];
-        else obj[h] = val;
-      });
-      return obj;
-    });
-}
-
 export default function PostsPage() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [exporting, setExporting] = useState(false);
-  const [exportingCsv, setExportingCsv] = useState(false);
   const [importing, setImporting] = useState(false);
   const [importError, setImportError] = useState("");
   const fileInputId = "import-posts-input";
@@ -177,27 +123,6 @@ export default function PostsPage() {
     }
   }
 
-  async function handleExportCsv() {
-    if (!activeSite) return;
-    setExportingCsv(true);
-    setMessage("");
-    setError("");
-    try {
-      const res = await api.get("/admin/posts/export?format=csv", { responseType: "blob" });
-      const url = URL.createObjectURL(res.data);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = makeFileName("csv");
-      a.click();
-      URL.revokeObjectURL(url);
-      setMessage("Export ready. Downloaded CSV file.");
-    } catch {
-      setError("Unable to export CSV right now.");
-    } finally {
-      setExportingCsv(false);
-    }
-  }
-
   async function handleImport(file: File | undefined) {
     if (!file) return;
     setImporting(true);
@@ -205,13 +130,8 @@ export default function PostsPage() {
     setMessage("");
     try {
       const text = await file.text();
-      let payload: any;
-      if (file.name.toLowerCase().endsWith(".csv")) {
-        payload = { posts: parseCsv(text) };
-      } else {
-        const parsed = JSON.parse(text);
-        payload = Array.isArray(parsed) ? { posts: parsed } : parsed;
-      }
+      const parsed = JSON.parse(text);
+      const payload = Array.isArray(parsed) ? { posts: parsed } : parsed;
       if (!payload?.posts || !Array.isArray(payload.posts) || !payload.posts.length) {
         throw new Error("File must contain an array of posts or { posts: [...] }");
       }
@@ -240,16 +160,14 @@ export default function PostsPage() {
             <input
               id={fileInputId}
               type="file"
-              accept="application/json,text/csv"
+              accept="application/json"
               className="hidden"
               onChange={(e) => handleImport(e.target.files?.[0])}
             />
             <Button variant="outline" onClick={handleExport} disabled={exporting}>
               {exporting ? "Exporting..." : "Export posts"}
             </Button>
-            <Button variant="outline" onClick={handleExportCsv} disabled={exportingCsv}>
-              {exportingCsv ? "Exporting CSV..." : "Export CSV"}
-            </Button>
+           
             <Button
               variant="secondary"
               onClick={() => document.getElementById(fileInputId)?.click()}
