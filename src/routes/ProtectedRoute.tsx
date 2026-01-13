@@ -15,6 +15,9 @@ export default function ProtectedRoute({
 
   if (loading) return <AuthLoader />;
   if (!admin) return <Navigate to="/login" replace />;
+  if (admin.role === "SUPER_ADMIN" && location.pathname !== "/super-admin") {
+    return <Navigate to="/super-admin" replace />;
+  }
   if (admin.hasPassword === false) {
     const nextPath = `${location.pathname}${location.search}`;
     return <Navigate to={`/set-password?next=${encodeURIComponent(nextPath)}`} replace />;

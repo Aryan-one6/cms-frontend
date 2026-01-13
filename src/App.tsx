@@ -18,7 +18,6 @@ import PostViewPage from "./pages/PostViewPage";
 import PricingPage from "./pages/PricingPage";
 import AccountPage from "./pages/AccountPage";
 import RequireAuth from "./routes/RequireAuth";
-
 import { SiteProvider } from "./lib/site";
 
 export default function App() {
