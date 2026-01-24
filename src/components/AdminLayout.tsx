@@ -201,27 +201,13 @@ function TopBar({ onOpenMenu }: { onOpenMenu: () => void }) {
   return (
     <header className="sticky top-0 z-30 border-b border-slate-800 bg-[radial-gradient(100%_80%_at_0%_0%,rgba(14,165,233,0.18),transparent_70%),linear-gradient(180deg,#0f172a,#0b1223)] backdrop-blur">
       <div className="mx-auto flex w-full max-w-screen-2xl items-center gap-3 px-4 py-3 lg:px-6">
-        <div className="flex items-center gap-3">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="rounded-full border border-slate-800 bg-slate-900 text-white hover:bg-slate-800 lg:hidden"
-            onClick={onOpenMenu}
-            aria-label="Open menu"
-          >
-            <Menu className="h-4 w-4" />
-          </Button>
-        </div>
-
-        <div className="flex flex-1 justify-center lg:hidden">
+        <div className="flex items-center lg:hidden">
           <Link to="/app" className="flex items-center gap-2">
             <div className="flex h-auto w-auto items-center justify-center ">
-              {/* <img src="/logo.png" alt="Triad CMS" className="h-12 w-full object-contain" /> */}
-              Triad CMS
+              <img src="/logo.png" alt="Triad CMS" className="h-12 w-full object-contain" />
             </div>
           </Link>
         </div>
-
         <div className="ml-auto flex items-center gap-3">
           <Button asChild size="sm" className="bg-cyan-500 text-slate-950 hover:bg-cyan-400">
             <Link to="/posts/new" className="flex items-center gap-2">
@@ -238,6 +224,15 @@ function TopBar({ onOpenMenu }: { onOpenMenu: () => void }) {
             }}
           >
             <LogOut className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="rounded-full border border-slate-800 bg-slate-900 text-white hover:bg-slate-800 lg:hidden"
+            onClick={onOpenMenu}
+            aria-label="Open menu"
+          >
+            <Menu className="h-4 w-4" />
           </Button>
         </div>
       </div>
