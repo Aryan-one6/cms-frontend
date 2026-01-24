@@ -142,7 +142,7 @@ export default function PricingPage() {
         key: orderRes.keyId,
         amount: orderRes.order.amount,
         currency: orderRes.order.currency,
-        name: "Sapphire CMS",
+        name: "TRIAD CMS",
         description: `${orderRes.plan.name} plan`,
         order_id: orderRes.order.id,
         prefill: {

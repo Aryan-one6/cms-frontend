@@ -34,7 +34,7 @@ const steps = [
   {
     label: "01",
     title: "Connect your brand",
-    detail: "Import your voice, fonts, and domains. Sapphire keeps everything consistent.",
+    detail: "Import your voice, fonts, and domains. Triad keeps everything consistent.",
   },
   {
     label: "02",
@@ -60,9 +60,9 @@ export default function LandingPage() {
       <header className="relative mx-auto flex w-full max-w-7xl items-center justify-between px-6 py-7">
         <div className="flex items-center gap-2 text-lg font-semibold tracking-tight">
           <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-400 to-indigo-500 text-slate-950 font-bold">
-            S
+            T
           </div>
-          Sapphire CMS
+          Triad CMS
         </div>
         <div className="flex items-center gap-3 text-sm text-slate-200">
           <Link
@@ -93,7 +93,7 @@ export default function LandingPage() {
               Build, brand, and ship content your team is proud of.
             </h1>
             <p className="max-w-3xl text-sm text-slate-200">
-              Sapphire CMS combines AI-assisted creation, a clean editorial workflow, and multi-site management
+              Triad CMS combines AI-assisted creation, a clean editorial workflow, and multi-site management
               into one fast, secure dashboard. Move from idea to publish without losing your brand voice.
             </p>
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -205,7 +205,7 @@ export default function LandingPage() {
               </div>
               <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-4">
                 <div className="text-2xl font-semibold text-white">50+</div>
-                <p className="text-slate-300">Teams scaling on Sapphire</p>
+                <p className="text-slate-300">Teams scaling on Triad</p>
               </div>
             </div>
           </div>
@@ -240,7 +240,7 @@ export default function LandingPage() {
             <Badge className="bg-indigo-200 text-indigo-900">Compact journey</Badge>
             <h2 className="text-3xl font-semibold text-white sm:text-4xl">Infographic-ready workflow</h2>
             <p className="text-slate-300">
-              Sapphire keeps the editorial path short and measurable. Every step is visual, so stakeholders
+              Triad keeps the editorial path short and measurable. Every step is visual, so stakeholders
               can scan progress without wading through docs.
             </p>
             <div className="space-y-4">
@@ -266,7 +266,7 @@ export default function LandingPage() {
               <div>
                 <p className="text-xs uppercase tracking-[0.25em] text-slate-400">Insights</p>
                 <div className="mt-2 text-3xl font-semibold text-white">3.4x faster shipping</div>
-                <p className="text-sm text-slate-300">Teams publish more with Sapphire’s guided AI tooling.</p>
+                <p className="text-sm text-slate-300">Teams publish more with Triad’s guided AI tooling.</p>
               </div>
               <div className="rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-300">
                 Live data
@@ -315,7 +315,7 @@ export default function LandingPage() {
             <Badge className="mx-auto bg-emerald-200 text-emerald-900">Launch faster</Badge>
             <h3 className="text-3xl font-semibold text-white sm:text-4xl">Ready for the next release cycle?</h3>
             <p className="text-slate-300">
-              Spin up a Sapphire workspace, invite your writers, and publish in hours—not weeks. Your brand stays
+              Spin up a Triad workspace, invite your writers, and publish in hours—not weeks. Your brand stays
               consistent, your team stays aligned, and your content stays fast.
             </p>
             <div className="flex flex-col justify-center gap-3 sm:flex-row sm:items-center sm:justify-center">

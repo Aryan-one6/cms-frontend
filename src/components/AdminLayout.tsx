@@ -115,7 +115,7 @@ function Sidebar({ expanded, onToggle, onNavigate }: { expanded: boolean; onTogg
           {expanded ? (
             <div>
               <div className="text-xs font-semibold uppercase tracking-[0.25em] text-slate-400">AI-Powered</div>
-              <div className="font-display text-lg font-semibold text-white">Sapphire CMS </div>
+              <div className="font-display text-lg font-semibold text-white">Triad CMS </div>
             </div>
           ) : null}
         </div>
@@ -214,8 +214,8 @@ function TopBar({ onOpenMenu }: { onOpenMenu: () => void }) {
         <div className="flex flex-1 justify-center lg:hidden">
           <Link to="/app" className="flex items-center gap-2">
             <div className="flex h-auto w-auto items-center justify-center ">
-              {/* <img src="/logo.png" alt="Sapphire CMS" className="h-12 w-full object-contain" /> */}
-              Sapphire CMS
+              {/* <img src="/logo.png" alt="Triad CMS" className="h-12 w-full object-contain" /> */}
+              Triad CMS
             </div>
           </Link>
         </div>

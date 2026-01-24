@@ -96,7 +96,7 @@ export default function Dashboard() {
               <Sparkles className="h-3 w-3" /> AI-powered CMS
             </Badge>
           }
-          title="Sapphire AI Command Center"
+          title="Triad AI Command Center"
           description={
             <>
               Welcome{data?.admin?.name ? `, ${data.admin.name}` : ""}. Orchestrate content, automate

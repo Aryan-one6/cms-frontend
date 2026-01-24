@@ -35,7 +35,7 @@ export default function Dashboard() {
             <div className="hidden md:block">
               <div className="rounded-xl bg-white/15 px-4 py-3 text-sm text-white/90 shadow-sm">
                 <div className="text-xs uppercase tracking-[0.2em] text-white/70">Workspace</div>
-                <div className="mt-1 font-medium">Sapphire CMS · Content Ops</div>
+                <div className="mt-1 font-medium">Triad CMS · Content Ops</div>
                 <div className="text-xs text-white/80">Aligned to cyan theme</div>
               </div>
             </div>
