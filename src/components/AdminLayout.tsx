@@ -109,13 +109,15 @@ function Sidebar({ expanded, onToggle, onNavigate }: { expanded: boolean; onTogg
     >
       <div className={`px-3 pb-4 pt-5 ${expanded ? "flex items-center justify-between" : "flex justify-center"}`}>
         <div className="flex items-center gap-2.5">
-          {/* <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/10 text-lg font-semibold text-white shadow-sm">
-            SC
-          </div> */}
+          <img
+            src="/logo.png"
+            alt="TRIAD logo"
+            className="h-15 w-15 "
+          />
           {expanded ? (
             <div>
               <div className="text-xs font-semibold uppercase tracking-[0.25em] text-slate-400">AI-Powered</div>
-              <div className="font-display text-lg font-semibold text-white">Triad CMS </div>
+              <div className="font-display text-sm font-semibold text-white">TRIAD CMS</div>
             </div>
           ) : null}
         </div>

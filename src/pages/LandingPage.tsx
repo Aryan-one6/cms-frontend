@@ -58,11 +58,13 @@ export default function LandingPage() {
       </div>
 
       <header className="relative mx-auto flex w-full max-w-7xl items-center justify-between px-6 py-7">
-        <div className="flex items-center gap-2 text-lg font-semibold tracking-tight">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-400 to-indigo-500 text-slate-950 font-bold">
-            T
-          </div>
-          Triad CMS
+        <div className="flex items-center gap-3 text-lg font-semibold tracking-tight">
+          <img
+            src="/logo.png"
+            alt="TRIAD logo"
+            className="h-10 w-10 rounded-xl bg-white shadow-sm ring-1 ring-white/50"
+          />
+          TRIAD CMS
         </div>
         <div className="flex items-center gap-3 text-sm text-slate-200">
           <Link
