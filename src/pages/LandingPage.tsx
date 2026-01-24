@@ -22,6 +22,14 @@ const highlights = [
   },
 ];
 
+const seoBullets = [
+  "Real-time guidance as you type—no copy-paste between tools.",
+  "Built-in SEO intelligence: competitor-aware benchmarks in your editor.",
+  "AI + SEO together: write search-ready drafts from the first line.",
+];
+
+const seoTagline = "Write and optimize in one place—search-ready from the first draft.";
+
 const steps = [
   {
     label: "01",
@@ -319,6 +327,46 @@ export default function LandingPage() {
               <Button asChild variant="outline" size="lg" className="border-slate-700 text-primary hover:text-white hover:bg-slate-800">
                 <Link to="/login">Go to dashboard</Link>
               </Button>
+            </div>
+          </div>
+        </section>
+
+        <section className="grid gap-6 rounded-3xl border border-slate-800 bg-slate-900/70 p-8 shadow-2xl">
+          <div className="flex flex-wrap items-center gap-3">
+            <Badge className="bg-cyan-200 text-cyan-900">Built-in SEO intelligence</Badge>
+            <span className="text-sm text-slate-300">Write search-ready content without extra tools.</span>
+          </div>
+          <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
+            <div className="space-y-4">
+              <h3 className="text-2xl font-semibold text-white">SEO optimization inside your editor</h3>
+              <p className="text-sm text-slate-200">
+                Draft, score, and publish in one workflow. Real-time guidance, SERP-aware benchmarks, and AI fixes live where you write—so Indian businesses, agencies, bloggers, and founders stay fast without switching tabs.
+              </p>
+              <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-4">
+                <div className="text-sm font-semibold text-white">{seoTagline}</div>
+                <ul className="mt-3 space-y-2 text-sm text-slate-200">
+                  {seoBullets.map((b) => (
+                    <li key={b} className="flex items-start gap-2">
+                      <span className="mt-1 h-1.5 w-1.5 rounded-full bg-cyan-400" />
+                      <span>{b}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+            <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-6 text-sm text-slate-200">
+              <div className="text-xs uppercase tracking-[0.2em] text-cyan-300">How it helps</div>
+              <ul className="mt-3 space-y-3">
+                <li>
+                  <span className="font-semibold text-white">Real-time guidance:</span> See keyword placement, headings, and term coverage while you type.
+                </li>
+                <li>
+                  <span className="font-semibold text-white">No copy-paste:</span> AI + SEO live in the editor—no extra tools to juggle.
+                </li>
+                <li>
+                  <span className="font-semibold text-white">Outcome-focused:</span> Competitor-aware targets for length, structure, links, and media before you publish.
+                </li>
+              </ul>
             </div>
           </div>
         </section>

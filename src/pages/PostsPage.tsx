@@ -25,6 +25,7 @@ type Post = {
   author: { id: string; name: string };
   isMine: boolean;
   canEdit: boolean;
+  seoScore?: number;
 };
 
 export default function PostsPage() {
@@ -207,7 +208,8 @@ export default function PostsPage() {
               <TableHead className="w-[110px]">Cover</TableHead>
               <TableHead>Title</TableHead>
               <TableHead className="w-[150px]">Owner</TableHead>
-              <TableHead className="w-[130px]">Status</TableHead>
+              <TableHead className="w-[120px]">Status</TableHead>
+              <TableHead className="w-[110px] text-center">SEO</TableHead>
               <TableHead className="w-[180px]">Updated</TableHead>
               <TableHead className="w-[260px] text-right">Actions</TableHead>
             </TableRow>
@@ -252,6 +254,16 @@ export default function PostsPage() {
                     <Badge variant={p.status === "PUBLISHED" ? "default" : "secondary"}>
                       {p.status}
                     </Badge>
+                  </TableCell>
+
+                  <TableCell className="text-center">
+                    {typeof p.seoScore === "number" ? (
+                      <div className="mx-auto flex h-9 w-9 items-center justify-center rounded-full bg-slate-900 text-xs font-semibold text-white">
+                        {p.seoScore}
+                      </div>
+                    ) : (
+                      <span className="text-xs text-slate-400">—</span>
+                    )}
                   </TableCell>
 
                   <TableCell className="text-slate-600">

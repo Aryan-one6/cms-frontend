@@ -192,8 +192,8 @@ export default function PricingPage() {
                 Publish faster. Ship smarter. Grow consistently.
               </h1>
               <p className="max-w-2xl text-slate-200">
-                Design, generate, and launch content with built-in AI writing and image generation. Choose the workspace setup
-                that matches your team size and velocity.
+                Design, generate, and launch content with built-in AI writing, images, and SEO intelligence. Choose the workspace setup
+                that matches your team size and velocity, with search-ready guidance in every plan.
               </p>
             </div>
             <div className="flex flex-col gap-3 text-sm text-slate-200 sm:flex-row sm:items-center sm:gap-6">
@@ -251,6 +251,9 @@ export default function PricingPage() {
                       )}
                     </CardTitle>
                     <p className="text-sm text-slate-600">{p.description}</p>
+                    <p className="text-xs font-semibold text-cyan-700">
+                      Built-in SEO intelligence: real-time guidance and SERP-aware benchmarks inside the editor.
+                    </p>
                     {p.highlight && <p className="text-xs font-medium text-indigo-600">{p.highlight}</p>}
                   </CardHeader>
                   <CardContent className="flex h-full flex-col gap-4">
